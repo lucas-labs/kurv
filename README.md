@@ -4,4 +4,5 @@
 <br>
 <br>
 
-${\normalsize \textbf{kurv}}$ is a process manager, mainly for node.js and python applications. It's written in `rust`.
+
+<p align="center">${\normalsize \textbf{kurv}}$ is a process manager, mainly for node.js and python applications. It's written in `rust`.</p>
