@@ -5,4 +5,33 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[profile.release]
+opt-level = 's'
+
 [dependencies]
+anyhow = "1.0.75"
+chrono = { version="0.4.31", features = ["serde"] }
+command-group = "5.0.1"
+crossterm = "0.27.0"
+indoc = "2.0.4"
+log = "0.4.20"
+regex-lite = "0.1.5"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_yaml = "0.9.27"
+thiserror = "1.0.50"
+
+# strum = "0.25.0"
+# strum_macros = "0.25.3"
+# tokio = { version = "1.35.0", features = ["process", "rt-multi-thread", "macros"] }
+
+
+# --- Platform specific dependencies ---
+# Windows
+# [target.'cfg(windows)'.dependencies]
+# winapi = { version = "0.3", features = [
+#   # "tlhelp32",
+#   "errhandlingapi",
+#   # "processthreadsapi",  
+#   # "minwindef",
+#   # "impl-default",
+# ] }
