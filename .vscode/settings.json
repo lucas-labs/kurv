@@ -1,21 +1,21 @@
 {
     "files.exclude": {
-        // // 😺 git
-        // ".git": true,
-        // ".gitignore": true,
-        // ".github": true,
+        // 😺 git
+        ".git": true,
+        ".gitignore": true,
+        ".github": true,
         
-        // // 📦 packages
-        // "Cargo.lock": true,
+        // 📦 packages
+        "Cargo.lock": true,
 
-        // // 🏗️ build
-        // // "target": true,
+        // 🏗️ build
+        "target": true,
 
-        // // 📝 docs
+        // 📝 docs
         // "README.md": true,
 
-        // // 🟦 vscode
-        // ".vscode": true,
-        // // "*.code-workspace": true,
+        // 🟦 vscode
+        ".vscode": true,
+        "*.code-workspace": true,
     }
 }

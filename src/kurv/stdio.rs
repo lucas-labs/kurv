@@ -1,9 +1,11 @@
 use {
     anyhow::Result,
+    log::error,
     std::fs::File,
     std::path::{Path, PathBuf},
-    log::error
 };
+
+use std::fs::{create_dir_all, OpenOptions};
 
 use crate::common::error::Error;
 
@@ -16,15 +18,23 @@ enum StdioFile {
 /// Create and return the two file handles for the `(stdout, stderr)` log file of a task.
 /// These are two handles to the same file.
 pub fn create_log_file_handles(task_name: &String, path: &Path) -> Result<(File, File), Error> {
+    // create path if it doesn't exist
+    create_dir_all(path)?;
+
     let (stdout_path, stderr_path) = get_log_paths(task_name, path);
-
-    let stdout_handle = File::create(&stdout_path)
-        .map_err(|err| Error::IoPathError(stdout_path.clone(), "getting stdout handle", err))?;
-
-    let stderr_handle = File::create(&stderr_path)
-        .map_err(|err| Error::IoPathError(stderr_path.clone(), "getting stderr handle", err))?;
+    let stdout_handle = create_or_append_file(&stdout_path)?;
+    let stderr_handle = create_or_append_file(&stderr_path)?;
 
     Ok((stdout_handle, stderr_handle))
+}
+
+/// creates a file or opens it for appending if it already exists
+fn create_or_append_file(path: &Path) -> Result<File, Error> {
+    OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .map_err(|err| Error::IoPathError(path.to_path_buf(), "getting stdout handle", err))
 }
 
 /// Get the path to the log file of a task.

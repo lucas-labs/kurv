@@ -8,6 +8,7 @@ impl Kurv {
     pub fn spawn_all(&mut self) {
         let mut eggs = self.state.eggs.clone();
         for (key, egg) in eggs.iter_mut() {
+            // if the egg is errored or pending, try to spawn it
             if egg.should_spawn() {
                 let (updated_egg, child) = self.spawn_egg(&egg);
 
