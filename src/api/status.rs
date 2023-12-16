@@ -1,6 +1,8 @@
-use super::RouterHandler;
-use crate::common::tcp::{json, Request, Response};
-use anyhow::Result;
+use {
+    super::RouterHandler,
+    crate::common::tcp::{json, Request, Response},
+    anyhow::Result,
+};
 
 impl RouterHandler {
     pub fn status(&self, _request: &Request) -> Result<Response> {

@@ -1,15 +1,11 @@
 use {
+    anyhow::anyhow,
     anyhow::Result,
     log::error,
     std::fs::File,
+    std::fs::{create_dir_all, OpenOptions},
     std::path::{Path, PathBuf},
 };
-
-use std::fs::{create_dir_all, OpenOptions};
-
-use anyhow::anyhow;
-
-// use crate::common::error::Error;
 
 /// The type of an stdio file.
 enum StdioFile {

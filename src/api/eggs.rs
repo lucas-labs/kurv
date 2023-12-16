@@ -1,10 +1,11 @@
-use std::collections::BTreeMap;
-
-use crate::{common::tcp::{json, Request, Response}, kurv::egg::Egg};
-use anyhow::{anyhow, Result};
-use serde::Serialize;
-
-use super::RouterHandler;
+use {
+    crate::api::RouterHandler,
+    crate::common::tcp::{json, Request, Response},
+    crate::kurv::egg::Egg,
+    anyhow::{anyhow, Result},
+    serde::Serialize,
+    std::collections::BTreeMap,
+};
 
 #[derive(Serialize)]
 struct ListEggsResponse(BTreeMap<String, Egg>);
@@ -16,10 +17,6 @@ impl RouterHandler {
 
         let eggs = state.eggs.clone();
 
-
-        Ok(json(
-            200,
-            ListEggsResponse(eggs),
-        ))
+        Ok(json(200, ListEggsResponse(eggs)))
     }
 }

@@ -1,14 +1,14 @@
-use std::{collections::HashMap, fmt::Display};
-
 mod pool;
 
 use {
-    std::{
-        io::{prelude::BufRead, BufReader, Read, Write},
-        net::TcpStream
-    },
     serde::Serialize,
-    serde_yaml
+    serde_yaml,
+    std::{
+        collections::HashMap,
+        fmt::Display,
+        io::{prelude::BufRead, BufReader, Read, Write},
+        net::TcpStream,
+    },
 };
 
 /// List of common HTTP methods mapped to their string representations.
@@ -106,11 +106,14 @@ pub fn json<T: Serialize>(status: u16, body: T) -> Response {
 }
 
 pub fn err(status: u16, msg: String) -> Response {
-    json(status, ErrorResponse {
-        code: status,
-        status: get_status_text(status),
-        message: msg,
-    })
+    json(
+        status,
+        ErrorResponse {
+            code: status,
+            status: get_status_text(status),
+            message: msg,
+        },
+    )
 }
 
 /// Returns a text response with the given body and status code.
@@ -137,9 +140,10 @@ pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
     let (path, query_params) = match full_path.find('?') {
         Some(index) => {
             let (path, query_string) = full_path.split_at(index);
-            let query_params: HashMap<String, String> = form_urlencoded::parse(query_string[1..].as_bytes())
-                .map(|(k, v)| (k.into_owned(), v.into_owned()))
-                .collect();
+            let query_params: HashMap<String, String> =
+                form_urlencoded::parse(query_string[1..].as_bytes())
+                    .map(|(k, v)| (k.into_owned(), v.into_owned()))
+                    .collect();
             (path.to_string(), query_params)
         }
         None => (full_path, HashMap::new()),

@@ -1,9 +1,11 @@
 mod style;
 pub mod theme;
-use crossterm::style::{Color, Attribute};
+
 pub use theme::Theme;
+
 use {
     self::style::StyleItem,
+    crossterm::style::{Attribute, Color},
     velcro::hash_map_from,
 };
 
@@ -30,9 +32,30 @@ pub fn get_theme() -> Theme {
         "green": [
             StyleItem::Color(Color::Green),
         ],
+        "blue": [
+            StyleItem::Color(Color::Blue),
+        ],
         "error": [
             StyleItem::Color(Color::Red),
             StyleItem::Attr(Attribute::Bold),
+        ],
+        "b": [
+            StyleItem::Attr(Attribute::Bold),
+        ],
+        "error": [
+            StyleItem::Color(Color::Red),
+        ],
+        "warn": [
+            StyleItem::Color(Color::Yellow),
+        ],
+        "info": [
+            StyleItem::Color(Color::White),
+        ],
+        "debug": [
+            StyleItem::Color(Color::Magenta),
+        ],
+        "trace": [
+            StyleItem::Color(Color::Cyan),
         ],
     })
 }

@@ -1,7 +1,8 @@
-use crate::common::tcp::{json, ErrorResponse, Request, Response};
-use anyhow::Result;
-
-use super::RouterHandler;
+use {
+    super::RouterHandler,
+    crate::common::tcp::{json, ErrorResponse, Request, Response},
+    anyhow::Result,
+};
 
 /// handle not allowed requests
 impl RouterHandler {

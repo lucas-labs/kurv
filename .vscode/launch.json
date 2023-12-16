@@ -11,7 +11,9 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/${workspaceFolderBasename}.exe",
-            "args": [],
+            "args": [
+                "server"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [

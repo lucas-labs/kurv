@@ -4,12 +4,11 @@
 //! This will execute general commands like `help` and `version`, depending
 //! on the arguments passed to the program.
 
-use anyhow::Result;
-use pico_args::Arguments;
-
-use crate::{
-    cli::components::{Component, Help},
-    printth,
+use {
+    crate::cli::components::{Component, Help},
+    crate::printth,
+    anyhow::Result,
+    pico_args::Arguments,
 };
 
 pub fn run(args: &mut Arguments, err: Option<&str>) -> Result<()> {

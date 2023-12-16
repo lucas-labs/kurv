@@ -1,5 +1,7 @@
-use anyhow::{Result, anyhow};
-use pico_args::Arguments;
+use {
+    anyhow::{anyhow, Result},
+    pico_args::Arguments,
+};
 
 pub mod cmd;
 pub mod color;
@@ -7,7 +9,7 @@ pub mod components;
 
 pub enum DispatchResult {
     Dispatched,
-    Server
+    Server,
 }
 
 pub fn dispatch_command() -> Result<DispatchResult> {
@@ -23,9 +25,12 @@ pub fn dispatch_command() -> Result<DispatchResult> {
                 // handle other subcommands
                 let command_result = match subcmd.as_str() {
                     "list" => cmd::list::run(&mut arguments),
-                    _ => cmd::default::run(&mut arguments, Some(
-                        format!("Invalid usage | Command '{}' not recognized", subcmd).as_str()
-                    )),
+                    _ => cmd::default::run(
+                        &mut arguments,
+                        Some(
+                            format!("Invalid usage | Command '{}' not recognized", subcmd).as_str(),
+                        ),
+                    ),
                 };
 
                 command_result.map(|_| DispatchResult::Dispatched)

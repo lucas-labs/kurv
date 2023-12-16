@@ -1,5 +1,6 @@
 use {
     chrono::prelude::*,
+    chrono::Duration,
     serde::{Deserialize, Serialize},
     std::{collections::HashMap, path::PathBuf},
 };
@@ -155,18 +156,6 @@ impl Egg {
         }
     }
 
-    /// marks the `egg` as running by:
-    /// - setting the `pid` of the `egg` to the given `pid`.
-    /// - setting the `start_time` of the `egg` to the current time.
-    /// - resetting the `try_count` of the `egg` to 0.
-    /// - setting the `status` of the `egg` to `EggStatus::Running`.
-    pub fn set_as_running(&mut self, pid: u32) {
-        self.set_pid(pid);
-        self.set_start_time();
-        self.reset_try_count();
-        self.set_status(EggStatus::Running);
-    }
-
     /// sets the `pid` of the `egg` to the given `pid`.
     pub fn set_pid(&mut self, pid: u32) {
         self.validate_state();
@@ -174,6 +163,16 @@ impl Egg {
         // set the pid if the egg has a state
         if let Some(ref mut egg_state) = self.state {
             egg_state.pid = pid;
+        }
+    }
+
+    // sets the `error` of the `egg` to the given `error`.
+    pub fn set_error(&mut self, error: String) {
+        self.validate_state();
+
+        // set the error if the egg has a state
+        if let Some(ref mut egg_state) = self.state {
+            egg_state.error = Some(error);
         }
     }
 
@@ -187,6 +186,26 @@ impl Egg {
         }
     }
 
+    /// marks the `egg` as running by:
+    /// - setting the `pid` of the `egg` to the given `pid`.
+    /// - setting the `start_time` of the `egg` to the current time.
+    /// - resetting the `try_count` of the `egg` to 0.
+    /// - setting the `status` of the `egg` to `EggStatus::Running`.
+    pub fn set_as_running(&mut self, pid: u32) {
+        self.set_pid(pid);
+        self.set_start_time();
+        self.set_status(EggStatus::Running);
+        self.set_error("".to_string());
+    }
+
+    /// marks the `egg` as errored by:
+    pub fn set_as_errored(&mut self, error: String) {
+        self.set_error(error);
+        self.set_status(EggStatus::Errored);
+        self.set_pid(0);
+        self.increment_try_count();
+    }
+
     /// checks if the `egg` should be spawned
     /// (if its state is `Pending` or `Errored`).
     ///
@@ -197,6 +216,30 @@ impl Egg {
             egg_state.status == EggStatus::Pending || egg_state.status == EggStatus::Errored
         } else {
             true
+        }
+    }
+
+    pub fn has_been_running_for(&self, duration: Duration) -> bool {
+        if let Some(ref egg_state) = self.state {
+            if let Some(start_time) = egg_state.start_time {
+                let now = Local::now();
+                let diff = now.signed_duration_since(start_time);
+                diff > duration
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    /// checks if the `egg` is running
+    /// (if its state is `Running`).
+    pub fn is_running(&self) -> bool {
+        if let Some(ref egg_state) = self.state {
+            egg_state.status == EggStatus::Running
+        } else {
+            false
         }
     }
 }

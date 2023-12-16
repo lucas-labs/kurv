@@ -1,6 +1,9 @@
-use command_group::GroupChild;
-
-use super::{egg::EggPaths, *};
+use {
+    super::{egg::EggPaths, *},
+    chrono::Duration,
+    command_group::GroupChild,
+    log::{debug, warn},
+};
 
 impl Kurv {
     /// try to spawn all eggs that are in `Pending` or `Errored` state
@@ -27,16 +30,70 @@ impl Kurv {
         }
     }
 
-    /// checks each eggs looking for those that have finished running. Returns a list 
-    /// of not running eggs.
-    // pub fn check_eggs(&mut self) -> Vec<Egg> {
-    // }
+    // checks each eggs looking for those that have finished running. Returns a list
+    // of not running eggs. To check if an egg is running, we need to access the
+    // workers map.
+    pub fn check_eggs(&mut self) {
+        let state = self.state.clone();
+        let mut state = state.lock().unwrap();
+
+        for (_, egg) in state.eggs.iter_mut() {
+            // if the egg is not running, then it was probably already checked
+            if !egg.is_running() {
+                continue;
+            }
+
+            // if the egg doesn't have an id, it means it hasn't been spawned yet
+            let id = match egg.id {
+                Some(id) => id,
+                None => {
+                    continue;
+                }
+            };
+
+            if let Some(child) = self.workers.get_child_mut(id) {
+                // check that the child is still running
+                match child.inner().try_wait() {
+                    Ok(None) => {
+                        // if it has been running for more than 5 seconds, we can assume
+                        // it started correctly and reset the try count just in case
+                        if egg.has_been_running_for(Duration::seconds(5)) {
+                            egg.reset_try_count();
+                        }
+                    }
+                    Ok(Some(status)) => {
+                        // yikes, the egg has exited, let's update its state
+                        let exit_err_msg: String = match status.code() {
+                            Some(code) => format!("Exited with code {}", code),
+                            None => format!("Exited with unknown code"),
+                        };
+
+                        // try to get the try count from the egg
+                        let try_count = match &egg.state {
+                            Some(state) => state.try_count,
+                            None => 0,
+                        };
+
+                        warn!(
+                            "egg <green>{}</green> exited: {} [#{}]",
+                            egg.name, exit_err_msg, try_count
+                        );
+
+                        egg.set_as_errored(exit_err_msg);
+                    }
+                    Err(e) => {
+                        eprintln!("error while waiting for child process {}: {}", id, e);
+                        continue;
+                    }
+                }
+            }
+        }
+    }
 
     /// spawns the given `egg` and adds it to the `workers` list
     fn spawn_egg(&mut self, egg: &Egg) -> (Egg, Option<GroupChild>) {
         let info = &self.info.lock().unwrap();
         let mut egg = egg.clone();
-
         let egg_name = egg.name.clone();
         let log_dir = info.paths.kurv_home.clone();
 
@@ -44,7 +101,7 @@ impl Kurv {
             match create_log_file_handles(&egg_name, &log_dir) {
                 Ok((stdout_log, stderr_log)) => (stdout_log, stderr_log),
                 Err(err) => {
-                    panic!("Failed to create log file handles: {}", err)
+                    panic!("failed to create log file handles: {}", err)
                 }
             };
 
@@ -78,7 +135,7 @@ impl Kurv {
         let child = match process {
             Ok(child) => child,
             Err(err) => {
-                let error = format!("Failed to spawn child {egg_name} with err: {err:?}");
+                let error = format!("failed to spawn child {egg_name} with err: {err:?}");
                 error!("{}", error);
                 clean_log_handles(&egg_name, &log_dir);
 
@@ -100,6 +157,8 @@ impl Kurv {
         };
 
         egg.set_as_running(child.id());
+
+        debug!("spawned egg <green>{}</green>", egg.name);
 
         (egg, Some(child))
     }

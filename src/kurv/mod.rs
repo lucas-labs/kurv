@@ -1,4 +1,7 @@
-use std::sync::{Mutex, Arc};
+use {
+    anyhow::Result,
+    std::sync::{Mutex, Arc}
+};
 
 pub mod egg;
 pub mod state;
@@ -53,6 +56,7 @@ impl Kurv {
         loop {
             // Check if there are any new eggs to spawn
             self.spawn_all();
+            self.check_eggs();
 
             // Check if all the running eggs are still actually running
             // self.check_running_eggs();
@@ -60,5 +64,14 @@ impl Kurv {
             // Sleep for a bit
             std::thread::sleep(std::time::Duration::from_millis(500));
         }
+    }
+
+    pub fn collect() -> Result<(Arc<Mutex<Info>>, Arc<Mutex<KurvState>>)> {
+        
+
+        let info = Info::new();
+        let state = KurvState::load(info.paths.kurv_file.clone()).unwrap();
+    
+        Ok((Arc::new(Mutex::new(info)), Arc::new(Mutex::new(state))))
     }
 }

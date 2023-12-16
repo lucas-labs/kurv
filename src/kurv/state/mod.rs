@@ -1,15 +1,11 @@
 use {
+    crate::kurv::Egg,
+    anyhow::Context,
     anyhow::Result,
+    log::debug,
     serde::{Deserialize, Serialize},
     std::{collections::BTreeMap, fs::File, path::PathBuf},
 };
-
-use std::sync::{Arc, Mutex};
-
-use anyhow::Context;
-use indoc::formatdoc;
-
-use crate::{kurv::Egg, common::Info};
 
 /// KurvState encapsulates the state of the server side application
 /// It's serialized to disk as a JSON file and loaded on startup
@@ -29,27 +25,28 @@ impl KurvState {
             .max()
             .unwrap_or(0)
             + 1;
-        
+
         egg.id = Some(next_id);
         self.eggs.insert(egg.name.clone(), egg);
 
         next_id
     }
 
-    /// tries to load the state from the given 
+    /// tries to load the state from the given
     /// path, or creates a new one if it doesn't exist
     pub fn load(path: PathBuf) -> Result<KurvState> {
         if !path.exists() {
+            debug!(".kurv file not found, starting fresh");
             return Ok(KurvState {
                 eggs: BTreeMap::new(),
             });
         }
 
         let rdr = File::open(&path)
-            .with_context(|| formatdoc!("Failed to open eggs file: {}", path.display()))?;
+            .with_context(|| format!("failed to open eggs file: {}", path.display()))?;
 
         let mut state: KurvState = serde_yaml::from_reader(rdr)
-            .context(format!("Failed to parse eggs file: {}", path.display()))?;
+            .context(format!("failed to parse eggs file: {}", path.display()))?;
 
         // check that all the eggs have an id and if not, assign one
         let mut next_id = 1;
@@ -61,6 +58,8 @@ impl KurvState {
                 next_id = egg.id.unwrap() + 1;
             }
         }
+
+        debug!("eggs collected");
 
         Ok(state)
     }
