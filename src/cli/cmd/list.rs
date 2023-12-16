@@ -1,14 +1,9 @@
 //! List Command
 //! Prints the list of eggs registered in kurv and their status as a table
 
-use {
-    anyhow::Result,
-    pico_args::Arguments,
-};
+use {anyhow::Result, pico_args::Arguments};
 
-pub fn run(
-    args: &mut Arguments
-) -> Result<()> {
+pub fn run(args: &mut Arguments) -> Result<()> {
     // print the list of eggs
 
     println!("kurv 0.1.0");

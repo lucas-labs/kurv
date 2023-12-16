@@ -1,24 +1,24 @@
 use {
     anyhow::Result,
-    std::sync::{Mutex, Arc}
+    std::sync::{Arc, Mutex},
 };
 
 pub mod egg;
+pub mod spawn;
 pub mod state;
 pub mod stdio;
 pub mod workers;
-pub mod spawn;
 
 use {
     crate::common::Info,
-    log::error,
-    std::process::Command,
-    stdio::create_log_file_handles,
     command_group::CommandGroup,
     egg::{Egg, EggStateUpsert},
+    log::error,
+    state::KurvState,
+    std::process::Command,
     stdio::clean_log_handles,
-    state::KurvState, 
-    workers::Workers
+    stdio::create_log_file_handles,
+    workers::Workers,
 };
 
 pub type KurvStateMtx = Arc<Mutex<KurvState>>;
@@ -33,10 +33,7 @@ pub struct Kurv {
 
 impl Kurv {
     /// creates a new instance of the kurv server
-    pub fn new(
-        info: InfoMtx,
-        state: KurvStateMtx,
-    ) -> Kurv {
+    pub fn new(info: InfoMtx, state: KurvStateMtx) -> Kurv {
         Kurv {
             info,
             state,
@@ -44,7 +41,7 @@ impl Kurv {
         }
     }
 
-    /// main loop of the server, it runs twice a second and checks the state 
+    /// main loop of the server, it runs twice a second and checks the state
     /// of the app:
     ///   - if there are any new eggs to spawn (eggs with state `Errored` or `Pending`),
     ///     try to spawn them
@@ -67,11 +64,9 @@ impl Kurv {
     }
 
     pub fn collect() -> Result<(Arc<Mutex<Info>>, Arc<Mutex<KurvState>>)> {
-        
-
         let info = Info::new();
         let state = KurvState::load(info.paths.kurv_file.clone()).unwrap();
-    
+
         Ok((Arc::new(Mutex::new(info)), Arc::new(Mutex::new(state))))
     }
 }

@@ -4,7 +4,7 @@ use regex_lite::Regex;
 enum WordCase {
     Lower,
     Upper,
-    Capital
+    Capital,
 }
 
 impl WordCase {
@@ -47,8 +47,10 @@ pub trait StrCase<T: AsRef<str>> {
     fn constant(&self) -> String;
 }
 
-
-impl<T: AsRef<str>> StrCase<T> for T where String: PartialEq<T> {
+impl<T: AsRef<str>> StrCase<T> for T
+where
+    String: PartialEq<T>,
+{
     fn kebab(&self) -> String {
         convert(self, Some(WordCase::Lower), "-")
     }
@@ -74,20 +76,24 @@ impl<T: AsRef<str>> StrCase<T> for T where String: PartialEq<T> {
     }
 }
 
-fn convert<T>(s: T, case: Option<WordCase>, delim: &str) -> String where T: AsRef<str> {
+fn convert<T>(s: T, case: Option<WordCase>, delim: &str) -> String
+where
+    T: AsRef<str>,
+{
     let words = split(s);
 
     if let Some(c) = case {
         let words = words.iter().map(|s| s.as_ref()).collect::<Vec<&str>>();
-        words.iter()
-            .map(|s| c.mutate(s))
-            .collect()
+        words.iter().map(|s| c.mutate(s)).collect()
     } else {
         words.join(&delim)
     }
 }
 
-pub fn split<T>(s: T) -> Vec<String> where T: AsRef<str> {
+pub fn split<T>(s: T) -> Vec<String>
+where
+    T: AsRef<str>,
+{
     let boundaries: [Regex; 4] = [
         // split on whitespace, hyphens, and underscores
         Regex::new(r"[\s\-_]").unwrap(),
@@ -101,12 +107,14 @@ pub fn split<T>(s: T) -> Vec<String> where T: AsRef<str> {
 
     let mut words = vec![s.as_ref().to_string()];
     for re in &boundaries {
-        words = words.iter()
+        words = words
+            .iter()
             .flat_map(|s| re.split(s))
             .map(|s| s.to_string())
             .collect();
     }
-    words.iter()
+    words
+        .iter()
         .filter(|s| !s.is_empty())
         .map(|s| s.to_string())
         .collect()

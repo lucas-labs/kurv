@@ -1,11 +1,7 @@
-mod to_string;
 mod case;
+mod to_string;
 
 pub use {
-    to_string::{
-        ToString,
-        str
-    },
-    
-    case::StrCase
+    case::StrCase,
+    to_string::{str, ToString},
 };

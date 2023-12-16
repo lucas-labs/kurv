@@ -14,7 +14,7 @@ pub struct Help<'a> {
 
 impl<'a> Component for Help<'a> {
     fn render(&self) -> String {
-        let logo = Logo{};
+        let logo = Logo {};
 
         let mut help = String::new();
 
@@ -58,7 +58,6 @@ impl<'a> Component for Help<'a> {
         help
     }
 }
-
 
 impl<'a> Help<'a> {
     fn render_items(&self, items: &[(&'a str, &'a str)]) -> String {

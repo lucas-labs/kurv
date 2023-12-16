@@ -1,7 +1,7 @@
 mod info;
 
-pub mod tcp;
-pub mod str;
 pub mod log;
+pub mod str;
+pub mod tcp;
 
 pub use info::Info;

@@ -20,7 +20,7 @@ impl Workers {
     pub fn new() -> Self {
         let mut pools = BTreeMap::new();
         pools.insert(String::from(DEFAULT_GROUP), BTreeMap::new());
-        
+
         Workers(pools)
     }
 
@@ -70,13 +70,18 @@ impl Workers {
         task_ids
     }
 
-
     /// Inserts a new children into the worker pool of the given group.
     ///
     /// This function should only be called when spawning a new process.
     /// At this point, we're sure that the worker pool for the given group already exists, hence
     /// the expect call.
-    pub fn add_child(&mut self, group: Option<&str>, worker_id: String, task_id: usize, child: GroupChild) {
+    pub fn add_child(
+        &mut self,
+        group: Option<&str>,
+        worker_id: String,
+        task_id: usize,
+        child: GroupChild,
+    ) {
         let group = group.unwrap_or(DEFAULT_GROUP);
 
         let pool = self

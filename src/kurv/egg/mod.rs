@@ -46,7 +46,7 @@ pub struct EggPaths {
     pub stderr: PathBuf,
 }
 
-/// an egg represents a process that can be started and stopped by kurv
+/// 🥚 ⇝ an egg represents a process that can be started and stopped by kurv
 #[derive(PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Egg {
     pub command: String,
@@ -82,7 +82,7 @@ pub struct Egg {
 }
 
 impl Egg {
-    /// checks that the `egg` has a `state` or 
+    /// checks that the `egg` has a `state` or
     /// creates a new one if it doesn't.
     fn validate_state(&mut self) {
         if self.state.is_none() {
@@ -132,7 +132,7 @@ impl Egg {
     /// sets the `status` of the `egg` to the given `status`.
     pub fn set_status(&mut self, status: EggStatus) {
         self.validate_state();
-        
+
         if let Some(ref mut egg_state) = self.state {
             egg_state.status = status;
         }

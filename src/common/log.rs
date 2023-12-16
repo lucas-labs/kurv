@@ -1,5 +1,5 @@
-use anyhow::{Result, anyhow};
-use log::{Record, Level, Metadata};
+use anyhow::{anyhow, Result};
+use log::{Level, Metadata, Record};
 
 use crate::printth;
 
@@ -15,9 +15,9 @@ impl Logger {
     fn level_theme(&self, level: Level) -> &str {
         match level {
             Level::Error => "error",
-            Level::Warn =>  "warn",
-            Level::Info =>  "info",  
-            Level::Debug => "debug", 
+            Level::Warn => "warn",
+            Level::Info => "info",
+            Level::Debug => "debug",
             Level::Trace => "trace",
         }
     }
@@ -36,12 +36,12 @@ impl log::Log for Logger {
         match record.level() {
             Level::Info => {
                 printth!("<dim>{}</dim> <{thm}>⇝</{thm}>  {}", date, record.args());
-            },
+            }
             _ => {
                 printth!("<dim>{}</dim> <{thm}>⇝  {}</{thm}>", date, record.args());
-            },
+            }
         }
     }
 
-    fn flush(&self) {}   
+    fn flush(&self) {}
 }

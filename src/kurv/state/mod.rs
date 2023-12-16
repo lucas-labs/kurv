@@ -1,3 +1,5 @@
+mod eggs;
+
 use {
     crate::kurv::Egg,
     anyhow::Context,
@@ -8,30 +10,13 @@ use {
 };
 
 /// KurvState encapsulates the state of the server side application
-/// It's serialized to disk as a JSON file and loaded on startup
+/// It's serialized to disk as a YAML file and loaded on startup
 #[derive(PartialEq, Eq, Clone, Deserialize, Serialize)]
 pub struct KurvState {
     pub eggs: BTreeMap<String, Egg>,
 }
 
 impl KurvState {
-    /// adds a new `egg` to the state and **returns** its assigned `id`
-    pub fn add_egg(&mut self, mut egg: Egg) -> usize {
-        // from self.eggs find the one with the highest egg.id
-        let next_id = self
-            .eggs
-            .iter()
-            .map(|(_, egg)| egg.id.unwrap_or(0))
-            .max()
-            .unwrap_or(0)
-            + 1;
-
-        egg.id = Some(next_id);
-        self.eggs.insert(egg.name.clone(), egg);
-
-        next_id
-    }
-
     /// tries to load the state from the given
     /// path, or creates a new one if it doesn't exist
     pub fn load(path: PathBuf) -> Result<KurvState> {

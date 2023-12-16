@@ -1,8 +1,6 @@
 use super::Component;
 
-
-const LOGO_STR : &str = 
-r#"<dim>
+const LOGO_STR: &str = r#"<dim>
 ▀▀████
   ████
   ████   ▀█▀  ▀████  ▀███   ▀███ ▄██▄ ▀███▀   ▀▀█▀
@@ -12,11 +10,10 @@ r#"<dim>
 ▄▄████▄ ▄███▄   ▀██▅▀ ███▄  ▄███▄▄        ███
 </dim>"#;
 
-pub struct Logo { }
+pub struct Logo {}
 
-impl Component for Logo { 
+impl Component for Logo {
     fn render(&self) -> String {
         LOGO_STR.to_string()
     }
 }
-
