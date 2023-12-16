@@ -6,7 +6,7 @@
         ".github": true,
         
         // 📦 packages
-        "Cargo.lock": true,
+        // "Cargo.lock": true,
 
         // 🏗️ build
         "target": true,

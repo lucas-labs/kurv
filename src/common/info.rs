@@ -8,7 +8,7 @@ use {
 const KURV_HOME_KEY: &str = "KURV_HOME";
 
 /// Important paths for the application
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(PartialEq, Eq, Clone, Deserialize, Serialize)]
 pub struct Paths {
     /// the path of the executable
     pub executable: PathBuf,
@@ -26,7 +26,7 @@ pub struct Paths {
 }
 
 /// General information about the app
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(PartialEq, Eq, Clone, Deserialize, Serialize)]
 pub struct Info {
     /// the process id of the application
     pub pid: u32,

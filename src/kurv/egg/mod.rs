@@ -39,6 +39,12 @@ pub struct EggStateUpsert {
     pub pid: Option<u32>,
 }
 
+#[derive(PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct EggPaths {
+    pub stdout: PathBuf,
+    pub stderr: PathBuf,
+}
+
 /// an egg represents a process that can be started and stopped by kurv
 #[derive(PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Egg {
@@ -46,7 +52,7 @@ pub struct Egg {
     pub name: String,
 
     /// unique id of the egg
-    #[serde(skip_serializing)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<usize>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,10 +74,14 @@ pub struct Egg {
     /// environment variables to be set before running the command
     #[serde(skip_serializing_if = "Option::is_none")]
     pub env: Option<HashMap<String, String>>,
+
+    /// paths to the stdout and stderr log files
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub paths: Option<EggPaths>,
 }
 
 impl Egg {
-    /// 🥚 ⇝ checks that the `egg` has a `state` or 
+    /// checks that the `egg` has a `state` or 
     /// creates a new one if it doesn't.
     fn validate_state(&mut self) {
         if self.state.is_none() {
@@ -82,12 +92,10 @@ impl Egg {
                 error: None,
                 pid: 0,
             });
-
-            println!("Created new state for egg {}", self.name);
         }
     }
 
-    /// 🥚 ⇝ if `self` already has a `state`, it will be updated,
+    /// if `self` already has a `state`, it will be updated,
     /// otherwise a new `EggState` will be created for the `egg`.
     ///
     /// `EggStateUpsert` is a temporal struct
@@ -120,7 +128,7 @@ impl Egg {
         }
     }
 
-    /// 🥚 ⇝ sets the `status` of the `egg` to the given `status`.
+    /// sets the `status` of the `egg` to the given `status`.
     pub fn set_status(&mut self, status: EggStatus) {
         self.validate_state();
         
@@ -129,7 +137,7 @@ impl Egg {
         }
     }
 
-    /// 🥚 ⇝ increments the `try_count` of the `egg` by 1.
+    /// increments the `try_count` of the `egg` by 1.
     pub fn increment_try_count(&mut self) {
         self.validate_state();
 
@@ -138,7 +146,7 @@ impl Egg {
         }
     }
 
-    /// 🥚 ⇝ resets the `try_count` of the `egg` to 0.
+    /// resets the `try_count` of the `egg` to 0.
     pub fn reset_try_count(&mut self) {
         self.validate_state();
 
@@ -147,7 +155,7 @@ impl Egg {
         }
     }
 
-    /// 🥚 ⇝ marks the `egg` as running by:
+    /// marks the `egg` as running by:
     /// - setting the `pid` of the `egg` to the given `pid`.
     /// - setting the `start_time` of the `egg` to the current time.
     /// - resetting the `try_count` of the `egg` to 0.
@@ -159,7 +167,7 @@ impl Egg {
         self.set_status(EggStatus::Running);
     }
 
-    /// 🥚 ⇝ sets the `pid` of the `egg` to the given `pid`.
+    /// sets the `pid` of the `egg` to the given `pid`.
     pub fn set_pid(&mut self, pid: u32) {
         self.validate_state();
 
@@ -169,7 +177,7 @@ impl Egg {
         }
     }
 
-    /// 🥚 ⇝ sets the `start_time` of the `egg` to the current time.
+    /// sets the `start_time` of the `egg` to the current time.
     pub fn set_start_time(&mut self) {
         self.validate_state();
 
@@ -179,7 +187,7 @@ impl Egg {
         }
     }
 
-    /// 🥚 ⇝ checks if the `egg` should be spawned
+    /// checks if the `egg` should be spawned
     /// (if its state is `Pending` or `Errored`).
     ///
     /// if it doesn't have a state, it should be spawned, as it's probably

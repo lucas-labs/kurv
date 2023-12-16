@@ -4,10 +4,12 @@ use {
     std::{collections::BTreeMap, fs::File, path::PathBuf},
 };
 
+use std::sync::{Arc, Mutex};
+
 use anyhow::Context;
 use indoc::formatdoc;
 
-use crate::kurv::Egg;
+use crate::{kurv::Egg, common::Info};
 
 /// KurvState encapsulates the state of the server side application
 /// It's serialized to disk as a JSON file and loaded on startup
@@ -17,7 +19,7 @@ pub struct KurvState {
 }
 
 impl KurvState {
-    /// 🥚 ⇝ adds a new `egg` to the state and **returns** its assigned `id`
+    /// adds a new `egg` to the state and **returns** its assigned `id`
     pub fn add_egg(&mut self, mut egg: Egg) -> usize {
         // from self.eggs find the one with the highest egg.id
         let next_id = self
@@ -34,8 +36,7 @@ impl KurvState {
         next_id
     }
 
-
-    /// 🥚 ⇝ tries to load the state from the given 
+    /// tries to load the state from the given 
     /// path, or creates a new one if it doesn't exist
     pub fn load(path: PathBuf) -> Result<KurvState> {
         if !path.exists() {
@@ -64,7 +65,7 @@ impl KurvState {
         Ok(state)
     }
 
-    /// 🥚 ⇝ saves the state to the given path
+    /// saves the state to the given path
     pub fn save(&self, path: &PathBuf) -> Result<()> {
         let serialized = serde_yaml::to_string(&self)?;
         std::fs::write(path, serialized)?;

@@ -1,25 +1,25 @@
 use command_group::GroupChild;
 
-use super::*;
+use super::{egg::EggPaths, *};
 
 impl Kurv {
-    /// 🧺 ⇝ for each egg in the `eggs` collection, tries to spawn it
-    /// if it's state is `Errored` or `Pending`
+    /// try to spawn all eggs that are in `Pending` or `Errored` state
     pub fn spawn_all(&mut self) {
-        let mut eggs = self.state.eggs.clone();
+        let state = self.state.clone();
+        let mut state = state.lock().unwrap();
+
+        let mut eggs = state.eggs.clone();
         for (key, egg) in eggs.iter_mut() {
             // if the egg is errored or pending, try to spawn it
             if egg.should_spawn() {
                 let (updated_egg, child) = self.spawn_egg(&egg);
 
-                // update original egg in self.state.eggs with the new values
-                self.state.eggs.insert(key.clone(), updated_egg);
+                // update original egg in state.eggs with the new values
+                state.eggs.insert(key.clone(), updated_egg);
 
                 // if child is Some, add it to the workers
                 if let Some(child) = child {
-                    // so, we have a running egg, let's add it to the worker and update its state
-                    // set_as_running will update the egg's pid, state, start_time and try_count
-                    // egg.set_as_running(child.id());
+                    // so, we have a running egg, let's add it to the worker
                     self.workers
                         .add_child(None, key.clone(), egg.id.unwrap(), child);
                 }
@@ -27,26 +27,38 @@ impl Kurv {
         }
     }
 
-    /// 🧺 ⇝ spawns the given `egg` and adds it to the `workers` list
+    /// checks each eggs looking for those that have finished running. Returns a list 
+    /// of not running eggs.
+    // pub fn check_eggs(&mut self) -> Vec<Egg> {
+    // }
+
+    /// spawns the given `egg` and adds it to the `workers` list
     fn spawn_egg(&mut self, egg: &Egg) -> (Egg, Option<GroupChild>) {
+        let info = &self.info.lock().unwrap();
         let mut egg = egg.clone();
 
         let egg_name = egg.name.clone();
-        let log_dir = &self.info.paths.kurv_home.clone();
+        let log_dir = info.paths.kurv_home.clone();
 
-        let (stdout_log, stderr_log) = match create_log_file_handles(&egg_name, &log_dir) {
-            Ok((stdout_log, stderr_log)) => (stdout_log, stderr_log),
-            Err(err) => {
-                panic!("Failed to create log file handles: {}", err)
-            }
-        };
+        let ((stdout_path, stdout_log), (stderr_path, stderr_log)) =
+            match create_log_file_handles(&egg_name, &log_dir) {
+                Ok((stdout_log, stderr_log)) => (stdout_log, stderr_log),
+                Err(err) => {
+                    panic!("Failed to create log file handles: {}", err)
+                }
+            };
+
+        egg.paths = Some(EggPaths {
+            stdout: stdout_path,
+            stderr: stderr_path,
+        });
 
         let (command, cwd, args, envs) = {
             (
                 egg.command.clone(),
                 match egg.cwd.clone() {
                     Some(cwd) => cwd,
-                    None => self.info.paths.working_dir.clone(),
+                    None => info.paths.working_dir.clone(),
                 },
                 egg.args.clone(),
                 egg.env.clone(),

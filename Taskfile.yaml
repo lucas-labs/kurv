@@ -7,4 +7,4 @@ tasks:
     desc: ⚡ run kurv
     cmds:
       - cargo build
-      - cargo run
+      - cargo run -- server

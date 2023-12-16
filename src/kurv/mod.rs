@@ -1,3 +1,5 @@
+use std::sync::{Mutex, Arc};
+
 pub mod egg;
 pub mod state;
 pub mod stdio;
@@ -16,27 +18,30 @@ use {
     workers::Workers
 };
 
-/// 🧺 ⇝ encapsulates the main functionality of the server side application
+pub type KurvStateMtx = Arc<Mutex<KurvState>>;
+pub type InfoMtx = Arc<Mutex<Info>>;
+
+/// encapsulates the main functionality of the server side application
 pub struct Kurv {
-    pub info: Info,
-    pub state: KurvState,
+    pub info: InfoMtx,
+    pub state: KurvStateMtx,
     pub workers: Workers,
 }
 
 impl Kurv {
-    /// 🧺 ⇝ creates a new instance of the kurv server
-    pub fn new() -> Kurv {
-        let info = Info::new();
-        let kurv_file = info.paths.kurv_file.clone();
-
+    /// creates a new instance of the kurv server
+    pub fn new(
+        info: InfoMtx,
+        state: KurvStateMtx,
+    ) -> Kurv {
         Kurv {
             info,
-            state: KurvState::load(kurv_file).unwrap(),
+            state,
             workers: Workers::new(),
         }
     }
 
-    /// 🧺 ⇝ main loop of the server, it runs twice a second and checks the state 
+    /// main loop of the server, it runs twice a second and checks the state 
     /// of the app:
     ///   - if there are any new eggs to spawn (eggs with state `Errored` or `Pending`),
     ///     try to spawn them
