@@ -1,3 +1,7 @@
+use anyhow::Ok;
+
+use self::cmd::wants_help;
+
 use {
     anyhow::{anyhow, Result},
     pico_args::Arguments,
@@ -19,6 +23,11 @@ pub fn dispatch_command() -> Result<DispatchResult> {
     let result = match subcommand {
         Some(subcmd) => {
             if subcmd == "server" {
+                if wants_help(&mut arguments) {
+                    cmd::server_help::print();
+                    return Ok(DispatchResult::Dispatched);
+                }
+
                 // server will be handled by the main function
                 Ok(DispatchResult::Server)
             } else {

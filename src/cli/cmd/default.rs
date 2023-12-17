@@ -4,6 +4,8 @@
 //! This will execute general commands like `help` and `version`, depending
 //! on the arguments passed to the program.
 
+use indoc::indoc;
+
 use {
     crate::cli::components::{Component, Help},
     crate::printth,
@@ -27,15 +29,24 @@ fn help(err: Option<&str>) {
         "{}",
         Help {
             command: "kurv",
-            summary: Some("Just a simple process manager =)"),
+            summary: Some(indoc!{
+                "just a simple process manager =)
+                
+                <white><b>!</b></white> you can also use <white>kurv [command] --help</white> to get 
+                help information about a specific command.
+                
+                <white>⇝</white>  <dim>example</dim>
+                
+                <dim>$</dim> <white>kurv</white> server <dim>--help</dim>"
+            }),
             error: err,
             options: Some(vec![
-                ("-h, --help", "Prints help information"),
-                ("-v, --version", "Prints version information"),
+                ("-h, --help", vec![], "prints help information"),
+                ("-v, --version", vec![], "prints version information"),
             ]),
             subcommands: Some(vec![
-                ("server", "Starts the kurv server"),
-                ("list", "Lists all running processes"),
+                ("server", vec!["s"], "starts the kurv server"),
+                ("list", vec!["l"], "prints eggs list and their statuses"),
             ]),
         }
         .render()
