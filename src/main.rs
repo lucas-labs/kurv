@@ -1,4 +1,4 @@
-mod api;
+pub mod api;
 mod cli;
 mod common;
 mod kurv;
@@ -10,7 +10,6 @@ use {
     cli::DispatchResult,
     common::log::Logger,
     kurv::Kurv,
-    log::info,
     log::Level,
     std::thread,
 };

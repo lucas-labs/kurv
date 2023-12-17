@@ -1,14 +1,13 @@
 use {
-    super::RouterHandler,
     crate::common::tcp::{json, Request, Response},
     anyhow::Result,
+    super::Context,
 };
 
-impl RouterHandler {
-    pub fn status(&self, _request: &Request) -> Result<Response> {
-        let info = self.info.clone();
-        let info = info.lock().unwrap();
 
-        Ok(json(200, info.clone()))
-    }
+pub fn status(_request: &Request, ctx: &Context) -> Result<Response> {
+    let info = ctx.info.clone();
+    let info = info.lock().unwrap();
+
+    Ok(json(200, info.clone()))
 }

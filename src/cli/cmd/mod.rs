@@ -1,5 +1,6 @@
 use pico_args::Arguments;
 
+pub mod api;
 pub mod default;
 pub mod list;
 

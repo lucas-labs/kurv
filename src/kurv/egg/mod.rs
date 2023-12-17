@@ -6,7 +6,7 @@ use {
 };
 
 /// defines the status of an egg
-#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Copy)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Copy, Debug)]
 pub enum EggStatus {
     Pending,
     Running,

@@ -75,23 +75,8 @@ pub struct ErrorResponse {
     pub message: String,
 }
 
-// /// A Handler is a function that takes a Request and returns a Response.
-// pub type Handler = fn(Request) -> Response;
-
-// /// A Router is a function that takes a method and path and returns a Handler.
-// pub type RouterFn = fn(&Request) -> Handler;
-
-// /// A Router is a struct that holds the router function.
-// pub struct Router(pub RouterFn);
-
-// impl Router {
-//     fn route(&self, request: &Request) -> Handler {
-//         (self.0)(request)
-//     }
-// }
-
 pub trait Handler {
-    fn handle(&self, request: &Request) -> Response;
+    fn handle(&self, request: &mut Request) -> Response;
 }
 
 /// Returns a JSON response with the given body and status code.
@@ -183,7 +168,7 @@ pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
         body = String::from_utf8_lossy(&body_bytes).to_string();
     }
 
-    let request = Request {
+    let mut request = Request {
         headers,
         method,
         path,
@@ -194,7 +179,7 @@ pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
     };
 
     // Handle the request and get the response
-    let response = handler.handle(&request);
+    let response = handler.handle(&mut request);
 
     let http_response = format!(
         "HTTP/1.1 {} {}\r\n{}\r\n\r\n{}",
