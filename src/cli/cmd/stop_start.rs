@@ -69,7 +69,9 @@ pub fn run(args: &mut Arguments, action: StopStartAction) -> Result<()> {
 
                     Ok(())
                 }
-                None => Ok(())
+                None => {
+                    help(strings)
+                }
             }
         }
         Err(e) => Err(e)

@@ -48,6 +48,7 @@ fn help(err: Option<&str>) {
                 ("server", vec!["s"], "starts the kurv server"),
                 ("list", vec!["l"], "prints eggs list and their statuses"),
                 ("stop", vec![], "stops a running egg"),
+                ("start", vec![], "starts a stopped egg"),
             ]),
         }
         .render()
