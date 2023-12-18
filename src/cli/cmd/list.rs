@@ -4,7 +4,7 @@ use {
         components::{Component, Help},
     },
     crate::common::str::ToString,
-    crate::kurv::egg::EggStatus,
+    crate::kurv::EggStatus,
     crate::printth,
     anyhow::Result,
     cli_table::{
@@ -28,7 +28,7 @@ pub fn run(args: &mut Arguments) -> Result<()> {
     let api = Api::new();
     let eggs_summary_list = api.eggs_summary()?;
 
-    printth!("\n<white>⇝</white>  <dim>eggs</dim>\n");
+    printth!("\n<white>🥚</white> <dim>eggs snapshot</dim>\n");
 
     let rows: Vec<Vec<CellStruct>> = eggs_summary_list
         .0

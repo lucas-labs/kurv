@@ -1,7 +1,9 @@
+use log::trace;
+
 mod pool;
 
 use {
-    serde::Serialize,
+    serde::{Serialize, Deserialize},
     serde_yaml,
     std::{
         collections::HashMap,
@@ -68,7 +70,7 @@ pub struct Response {
 }
 
 /// common error response
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct ErrorResponse {
     pub code: u16,
     pub status: String,
@@ -120,6 +122,9 @@ pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
     let parts: Vec<&str> = request_line.trim().split_whitespace().collect();
     let method = parts[0].to_string();
     let full_path = parts[1].to_string();
+
+    let trim: &[_] = &['\r', '\n'];
+    trace!("{}", request_line.trim_matches(trim));
 
     // Extract path and query parameters
     let (path, query_params) = match full_path.find('?') {

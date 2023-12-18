@@ -1,7 +1,7 @@
-mod eggs;
+pub mod eggs;
 
 use {
-    crate::kurv::Egg,
+    super::egg::Egg,
     anyhow::Context,
     anyhow::Result,
     log::debug,

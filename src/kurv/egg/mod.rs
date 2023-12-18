@@ -177,12 +177,22 @@ impl Egg {
     }
 
     /// sets the `start_time` of the `egg` to the current time.
-    pub fn set_start_time(&mut self) {
+    pub fn reset_start_time(&mut self) {
         self.validate_state();
 
         // set the start time if the egg has a state
         if let Some(ref mut egg_state) = self.state {
             egg_state.start_time = Some(Local::now());
+        }
+    }
+
+    /// sets the `start_time` of the `egg`
+    pub fn set_start_time(&mut self, time: Option<DateTime<Local>>) {
+        self.validate_state();
+
+        // set the start time if the egg has a state
+        if let Some(ref mut egg_state) = self.state {
+            egg_state.start_time = time;
         }
     }
 
@@ -193,7 +203,7 @@ impl Egg {
     /// - setting the `status` of the `egg` to `EggStatus::Running`.
     pub fn set_as_running(&mut self, pid: u32) {
         self.set_pid(pid);
-        self.set_start_time();
+        self.reset_start_time();
         self.set_status(EggStatus::Running);
         self.set_error("".to_string());
     }
@@ -204,6 +214,14 @@ impl Egg {
         self.set_status(EggStatus::Errored);
         self.set_pid(0);
         self.increment_try_count();
+    }
+
+    /// marks the `egg` as stopped by:
+    pub fn set_as_stopped(&mut self) {
+        self.set_status(EggStatus::Stopped);
+        self.set_pid(0);
+        self.reset_try_count();
+        self.set_start_time(None);
     }
 
     /// checks if the `egg` should be spawned
@@ -238,6 +256,16 @@ impl Egg {
     pub fn is_running(&self) -> bool {
         if let Some(ref egg_state) = self.state {
             egg_state.status == EggStatus::Running
+        } else {
+            false
+        }
+    }
+
+    /// checks if the `egg` is running
+    /// (if its state is `Running`).
+    pub fn is_stopped(&self) -> bool {
+        if let Some(ref egg_state) = self.state {
+            egg_state.status == EggStatus::Stopped
         } else {
             false
         }

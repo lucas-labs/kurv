@@ -13,7 +13,7 @@ use {
 pub fn get_theme() -> Theme {
     Theme::new(hash_map_from! {
         "head": [
-            StyleItem::Color(Color::Blue),
+            StyleItem::Color(Color::DarkBlue),
             StyleItem::Attr(Attribute::Bold),
         ],
         "highlight": [
@@ -33,7 +33,7 @@ pub fn get_theme() -> Theme {
             StyleItem::Color(Color::Green),
         ],
         "blue": [
-            StyleItem::Color(Color::Blue),
+            StyleItem::Color(Color::DarkBlue),
         ],
         "error": [
             StyleItem::Color(Color::Red),

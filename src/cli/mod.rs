@@ -22,27 +22,25 @@ pub fn dispatch_command() -> Result<DispatchResult> {
 
     let result = match subcommand {
         Some(subcmd) => {
-            if subcmd == "server" {
-                if wants_help(&mut arguments) {
-                    cmd::server_help::print();
-                    return Ok(DispatchResult::Dispatched);
+            match subcmd.as_ref() {
+                "server" | "s" => {
+                    if wants_help(&mut arguments) {
+                        cmd::server_help::print();
+                        return Ok(DispatchResult::Dispatched);
+                    }
+
+                    // server will be handled by the main function
+                    Ok(DispatchResult::Server)
                 }
-
-                // server will be handled by the main function
-                Ok(DispatchResult::Server)
-            } else {
-                // handle other subcommands
-                let command_result = match subcmd.as_str() {
-                    "list" => cmd::list::run(&mut arguments),
-                    _ => cmd::default::run(
-                        &mut arguments,
-                        Some(
-                            format!("Invalid usage | Command '{}' not recognized", subcmd).as_str(),
-                        ),
-                    ),
-                };
-
-                command_result.map(|_| DispatchResult::Dispatched)
+                "list" | "l" | "ls" | "snaps" => {
+                    cmd::list::run(&mut arguments).map(|_| DispatchResult::Dispatched)
+                }
+                "stop" => cmd::stop::run(&mut arguments).map(|_| DispatchResult::Dispatched),
+                _ => cmd::default::run(
+                    &mut arguments,
+                    Some(format!("Invalid usage | Command '{}' not recognized", subcmd).as_str()),
+                )
+                .map(|_| DispatchResult::Dispatched),
             }
         }
         // if there is no subcommand, run the default command

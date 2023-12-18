@@ -2,12 +2,12 @@ use {
     super::{egg::EggPaths, *},
     chrono::Duration,
     command_group::GroupChild,
-    log::{debug, warn},
+    log::{debug, warn, error},
 };
 
 impl Kurv {
     /// try to spawn all eggs that are in `Pending` or `Errored` state
-    pub fn spawn_all(&mut self) {
+    pub(crate) fn spawn_all(&mut self) {
         let state = self.state.clone();
         let mut state = state.lock().unwrap();
 
@@ -30,10 +30,9 @@ impl Kurv {
         }
     }
 
-    // checks each eggs looking for those that have finished running. Returns a list
-    // of not running eggs. To check if an egg is running, we need to access the
-    // workers map.
-    pub fn check_eggs(&mut self) {
+    /// checks each eggs looking for those that have finished running unexpectedly
+    /// and sets their state accordingly. Also keeps re-try count updated
+    pub(crate) fn check_running_eggs(&mut self) {
         let state = self.state.clone();
         let mut state = state.lock().unwrap();
 
@@ -82,7 +81,7 @@ impl Kurv {
                         egg.set_as_errored(exit_err_msg);
                     }
                     Err(e) => {
-                        eprintln!("error while waiting for child process {}: {}", id, e);
+                        error!("error while waiting for child process {}: {}", id, e);
                         continue;
                     }
                 }

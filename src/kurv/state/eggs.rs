@@ -21,7 +21,7 @@ impl KurvState {
     }
 
     /// 🥚 ⇝ retrieves the egg with the given `id` from the state
-    pub fn get(&self, id: usize) -> Option<&Egg> {
+    pub fn get_by_id(&self, id: usize) -> Option<&Egg> {
         for (_, e) in self.eggs.iter() {
             if e.id == Some(id) {
                 return Some(e);
@@ -32,7 +32,7 @@ impl KurvState {
     }
 
     /// 🥚 ⇝ retrieves the egg with the given `id` from the state as a mutable reference
-    pub fn get_mut(&mut self, id: usize) -> Option<&mut Egg> {
+    pub fn get_by_id_mut(&mut self, id: usize) -> Option<&mut Egg> {
         for (_, e) in self.eggs.iter_mut() {
             if e.id == Some(id) {
                 return Some(e);
@@ -65,7 +65,7 @@ impl KurvState {
     }
 
     /// 🥚 ⇝ retrieves the egg with the given `name` from the state
-    pub fn get_by_name(&mut self, name: &str) -> Option<&Egg> {
+    pub fn get_by_name(&self, name: &str) -> Option<&Egg> {
         self.eggs.get(name)
     }
 
@@ -73,6 +73,93 @@ impl KurvState {
     pub fn get_by_name_mut(&mut self, name: &str) -> Option<&mut Egg> {
         self.eggs.get_mut(name)
     }
+
+    /// 🥚 ⇝ retrieves the `egg` with the given token; the token can be:
+    ///   - the internal id of the egg
+    ///   - the pid of the running egg
+    ///   - the name (key) of the egg
+    pub fn get(&self, token: String) -> Option<&Egg> {
+        // since we receive a string, we will search by name first to avoid
+        // innecesary conversions
+        if let Some(egg) = self.get_by_name(token.as_str()) {
+            return Some(egg);
+        }
+
+        // if we couldn't find it by name, we try by id
+        if let Some(id) = token.parse::<usize>().ok() {
+            if let Some(egg) = self.get_by_id(id) {
+                return Some(egg);
+            }
+        }
+
+        // and at last, we try by pid
+        if let Some(pid) = token.parse::<u32>().ok() {
+            if let Some(egg) = self.get_by_pid(pid) {
+                return Some(egg);
+            }
+        }
+
+        // wrong token probably =)
+        None
+    }
+
+    // /// 🥚 ⇝ retrieves the `egg` with the given token; the token can be:
+    // ///   - the internal id of the egg
+    // ///   - the pid of the running egg
+    // ///   - the name (key) of the egg
+    // pub fn get_mut(&mut self, token: String) -> Option<&mut Egg> {
+    //     let mut maybe_egg: Option<&mut Egg> = None;
+
+    //     // // since we receive a string, we will search by name first to avoid
+    //     // // innecesary conversions
+    //     // if let Some(egg) = self.get_by_name_mut(token.as_str()) {
+    //     //     // return Some(egg);
+    //     //     maybe_egg = Some(egg);
+    //     // }
+
+    //     // // if we couldn't find it by name, we try by id
+    //     // if let Some(id) = token.parse::<usize>().ok() {
+    //     //     if let Some(egg) = self.get_by_id_mut(id) {
+    //     //         maybe_egg = Some(egg);
+    //     //     }
+    //     // }
+
+    //     // // and at last, we try by pid
+    //     // if let Some(pid) = token.parse::<u32>().ok() {
+    //     //     if let Some(egg) = self.get_by_pid_mut(pid) {
+    //     //         maybe_egg = Some(egg);
+    //     //     }
+    //     // }
+
+    //     let mut maybe: Option<&mut Egg> = {
+    //         // if let Some(egg) = self.get_by_name_mut(token.as_str()) {
+    //         //     // return Some(egg);
+    //         //     return Some(egg);
+    //         // }
+
+    //             // if we couldn't find it by name, we try by id
+    //         if let Some(id) = token.parse::<usize>().ok() {
+    //             if let Some(egg) = self.get_by_id_mut(id) {
+    //                 let mut mut_egg = egg.clone();
+    //                 return Some(&mut mut_egg);
+    //             }
+    //         }
+
+    //         // // and at last, we try by pid
+    //         // if let Some(pid) = token.parse::<u32>().ok() {
+    //         //     if let Some(egg) = self.get_by_pid_mut(pid) {
+    //         //         return Some(egg);
+    //         //     }
+    //         // }
+
+
+    //         None
+    //     };
+
+    //     // wrong token probably =)
+    //     // maybe_egg
+    //     None
+    // }
 
     /// 🥚 ⇝ removes the egg with the given `name` from the state, and returns it
     ///
@@ -93,6 +180,17 @@ impl KurvState {
 
             self.eggs.remove(name);
             Ok(egg)
+        } else {
+            Err(anyhow!("Egg with name '{}' not found", name))
+        }
+    }
+
+    /// 🥚 ⇝ stops an egg
+    pub fn stop(&mut self, name: &str) -> Result<Egg> {
+        if let Some(egg) = self.get_by_name_mut(name) {
+            // check that egg.state.pid is None
+            egg.set_as_stopped();
+            Ok(egg.clone())
         } else {
             Err(anyhow!("Egg with name '{}' not found", name))
         }

@@ -3,19 +3,24 @@ use {
     std::sync::{Arc, Mutex},
 };
 
-pub mod egg;
-pub mod spawn;
-pub mod state;
-pub mod stdio;
-pub mod workers;
+mod egg;
+mod spawn;
+mod kill;
+mod state;
+mod stdio;
+mod workers;
+
+pub use egg::EggStatus;
+pub use egg::Egg;
 
 use {
     crate::common::Info,
     command_group::CommandGroup,
-    egg::{Egg, EggStateUpsert},
-    log::error,
+    egg::EggStateUpsert,
     state::KurvState,
     std::process::Command,
+    std::time::Duration,
+    std::thread::sleep,
     stdio::clean_log_handles,
     stdio::create_log_file_handles,
     workers::Workers,
@@ -47,19 +52,19 @@ impl Kurv {
     ///     try to spawn them
     ///   - checks if all the running eggs are still actually running, and if not,
     ///     change their state to `Pending` or `Errored` depending on the reason and
-    ///     remove them from the `workers` list so that they can be restarted on the
+    ///     remove them from the `workers` list so that they can be re-started on the
     ///     next tick
+    ///   - check if all eggs that were marked as stopped are actually stopped and 
+    ///     kill them otherwise
     pub fn run(&mut self) {
         loop {
             // Check if there are any new eggs to spawn
             self.spawn_all();
-            self.check_eggs();
+            self.check_running_eggs();
+            self.check_stopped_eggs();
 
-            // Check if all the running eggs are still actually running
-            // self.check_running_eggs();
-
-            // Sleep for a bit
-            std::thread::sleep(std::time::Duration::from_millis(500));
+            // sleep for a bit, we don't want to destroy the cpu
+            sleep(Duration::from_millis(500));
         }
     }
 

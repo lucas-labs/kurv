@@ -3,8 +3,8 @@
 version: '3'
 
 tasks:
-  default:
-    desc: ⚡ run kurv
+  build:release:
+    desc: ⚡ build kurv (release)
     cmds:
-      - cargo build
-      - cargo run -- server
+      - cargo build --release
+      - python check_size.py

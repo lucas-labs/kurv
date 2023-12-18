@@ -2,7 +2,7 @@ use crate::common::duration::humanize_duration;
 
 use {
     crate::common::tcp::{json, Request, Response},
-    crate::kurv::egg::EggStatus,
+    crate::kurv::EggStatus,
     super::Context,
     super::err,
     anyhow::{anyhow, Result},
@@ -21,6 +21,9 @@ pub struct EggSummary {
     pub uptime: String,
     pub retry_count: u32,
 }
+
+const WRONG_ID_MSG: &str = "missing or invalid egg id";
+const NOT_FOUND_MSG: &str = "egg not found";
 
 pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
     let state = ctx.state.clone();
@@ -72,13 +75,33 @@ pub fn get(request: &Request, ctx: &Context) -> Result<Response> {
         let state = ctx.state.clone();
         let state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
         if let Some(id) = id.parse::<usize>().ok() {
-            if let Some(egg) = state.get(id) {
+            if let Some(egg) = state.get_by_id(id) {
                 return Ok(json(200, egg.clone()));
             }
 
-            return Ok(err(404, format!("egg not found: {}", id)));
+            return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, id)));
         }
     }
 
-    Ok(err(400, "bad request: missing or invalid egg id".to_string()))
+    Ok(err(400, WRONG_ID_MSG.to_string()))
+}
+
+
+/// tries to stop a running egg
+pub fn stop(request: &Request, ctx: &Context) -> Result<Response> {
+    if let Some(id) = request.path_params.get("egg_id") {
+        let state = ctx.state.clone();
+        let mut state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
+
+        if let Some(id) = id.parse::<usize>().ok() {
+            if let Some(egg) = state.get_by_id_mut(id) {
+                egg.set_status(EggStatus::Stopped);
+                return Ok(json(200, egg.clone()));
+            }
+
+            return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, id)));
+        }
+    }
+
+    Ok(err(400, WRONG_ID_MSG.to_string()))
 }

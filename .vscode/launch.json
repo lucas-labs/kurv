@@ -12,7 +12,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/${workspaceFolderBasename}.exe",
             "args": [
-                "list"
+                "stop",
+                "1l"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

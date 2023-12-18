@@ -1,4 +1,4 @@
-pub mod api;
+mod api;
 mod cli;
 mod common;
 mod kurv;

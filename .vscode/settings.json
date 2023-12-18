@@ -6,16 +6,18 @@
         ".github": true,
         
         // 📦 packages
-        // "Cargo.lock": true,
+        "Cargo.lock": true,
 
         // 🏗️ build
         "target": true,
+        "check_size.py": true,
 
         // 📝 docs
-        // "README.md": true,
+        "README.md": true,
 
         // 🟦 vscode
         ".vscode": true,
         "*.code-workspace": true,
-    }
+    },
+    "python.analysis.typeCheckingMode": "basic"
 }

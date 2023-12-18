@@ -4,7 +4,11 @@ use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::str;
 
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
+use serde::Deserialize;
+
+use crate::common::tcp::ErrorResponse;
+use crate::kurv::Egg;
 
 // ApiResponse struct to hold response headers and body
 pub(crate) struct ApiResponse {
@@ -33,7 +37,6 @@ impl Api {
     fn request(&self, method: &str, path: &str, body: Option<&str>) -> Result<ApiResponse> {
         let mut stream = TcpStream::connect(format!("{}:{}", self.host, self.port))
             .map_err(|_| anyhow!("failed to connect to api server"))?;
-            
 
         let body_str = match body {
             Some(b) => format!("Content-Length: {}\r\n\r\n{}", b.len(), b),
@@ -54,10 +57,8 @@ impl Api {
             .read_to_end(&mut buffer)
             .map_err(|_| anyhow!("failed to read from api server"))?;
 
-        let response_str =
-            str::from_utf8(&buffer)
+        let response_str = str::from_utf8(&buffer)
             .map_err(|_| anyhow!("failed to parse response from api server"))?;
-            
 
         // Extract headers and body from the response string
         let mut header_body_split = response_str.split("\r\n\r\n");
@@ -85,5 +86,34 @@ impl Api {
     // Method to perform HTTP DELETE request
     pub(crate) fn delete(&self, path: &str) -> Result<ApiResponse> {
         self.request("DELETE", path, None)
+    }
+}
+
+pub enum ParsedResponse<T> {
+    Success(T),
+    Failure(ErrorResponse),
+}
+
+/// parses a response from the server api.
+/// 
+/// It returns a `ParsedResponse` that can either be a success call of type `T`
+/// or a failure of type `ErrorResponse`
+pub fn parse_response<'a, T: Deserialize<'a>>(
+    response: &'a ApiResponse,
+) -> Result<ParsedResponse<T>> {
+    let maybe_egg: Result<T, _> = serde_json::from_str(response.body.as_str());
+
+    match maybe_egg {
+        Ok(parsed) => return Ok(ParsedResponse::Success(parsed)),
+        Err(_) => {
+            // try to parse it as an ErrorResponse.
+            let maybe_err_resp: Result<ErrorResponse, _> =
+                serde_json::from_str(response.body.as_str());
+
+            match maybe_err_resp {
+                Ok(parsed) => Ok(ParsedResponse::Failure(parsed)),
+                Err(_) => Err(anyhow!("couldn't parse kurv server response")),
+            }
+        }
     }
 }

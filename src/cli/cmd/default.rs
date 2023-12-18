@@ -47,6 +47,7 @@ fn help(err: Option<&str>) {
             subcommands: Some(vec![
                 ("server", vec!["s"], "starts the kurv server"),
                 ("list", vec!["l"], "prints eggs list and their statuses"),
+                ("stop", vec![], "stops a running egg"),
             ]),
         }
         .render()
