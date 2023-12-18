@@ -1,4 +1,4 @@
-use crate::common::duration::humanize_duration;
+use crate::common::{duration::humanize_duration, str::ToString};
 
 use {
     crate::common::tcp::{json, Request, Response},
@@ -97,7 +97,7 @@ pub fn start(request: &Request, ctx: &Context) -> Result<Response> {
     set_status(request, ctx, EggStatus::Pending)
 }
 
-/// changes the state of an egg
+/// changes the status of an egg to Stopped or Pending
 pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result<Response> {
     if let Some(id) = request.path_params.get("egg_id") {
         let state = ctx.state.clone();
@@ -105,6 +105,23 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
 
         if let Some(id) = id.parse::<usize>().ok() {
             if let Some(egg) = state.get_by_id_mut(id) {
+                match status {
+                    EggStatus::Pending => {
+                        // we can only change to pending if its state is currently Stopped
+                        match egg.state.clone() {
+                            Some(state) => {
+                                if state.status != EggStatus::Stopped {
+                                    return Ok(err(400, format!("egg {} is already running", egg.name)));
+                                }
+                            },
+                            _ => {}
+                        }                        
+                    },
+                    EggStatus::Stopped => {},
+                    _ => return Ok(err(400, format!("can't change status to '{}'", status.str())))
+                };
+    
+
                 egg.set_status(status);
                 return Ok(json(200, egg.clone()));
             }
