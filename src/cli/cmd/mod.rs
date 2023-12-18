@@ -1,7 +1,7 @@
 use pico_args::Arguments;
 
 mod api;
-pub mod stop;
+pub mod stop_start;
 pub mod default;
 pub mod list;
 pub mod server_help;

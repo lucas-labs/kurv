@@ -35,6 +35,7 @@ impl Router {
             ("GET", "/eggs", eggs::summary),
             ("GET", "/eggs/(?P<egg_id>[0-9]+)", eggs::get),
             ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/stop", eggs::stop),
+            ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/start", eggs::start),
             (".*", ".*", err::not_allowed), // last resort
         ]
     }

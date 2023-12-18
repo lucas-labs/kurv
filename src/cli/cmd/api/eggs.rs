@@ -14,11 +14,8 @@ impl Api {
         Ok(eggs_summary_list)
     }
 
-    pub fn stop_egg(&self, id: String) -> Result<Egg> {
-        let response = self.post(format!("/eggs/{}/stop", id).as_ref(), "")?;
-
-        
-        // let maybe_egg: Egg = serde_json::from_str(&response.body)?;
+    pub fn stop_start_egg(&self, id: String, action: String) -> Result<Egg> {
+        let response = self.post(format!("/eggs/{id}/{action}").as_ref(), "")?;
         let maybe_egg: ParsedResponse<Egg> = parse_response(&response)?;
         
         match maybe_egg {

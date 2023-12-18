@@ -89,13 +89,23 @@ pub fn get(request: &Request, ctx: &Context) -> Result<Response> {
 
 /// tries to stop a running egg
 pub fn stop(request: &Request, ctx: &Context) -> Result<Response> {
+    set_status(request, ctx, EggStatus::Stopped)
+}
+
+/// tries to stop a running egg
+pub fn start(request: &Request, ctx: &Context) -> Result<Response> {
+    set_status(request, ctx, EggStatus::Pending)
+}
+
+/// changes the state of an egg
+pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result<Response> {
     if let Some(id) = request.path_params.get("egg_id") {
         let state = ctx.state.clone();
         let mut state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
 
         if let Some(id) = id.parse::<usize>().ok() {
             if let Some(egg) = state.get_by_id_mut(id) {
-                egg.set_status(EggStatus::Stopped);
+                egg.set_status(status);
                 return Ok(json(200, egg.clone()));
             }
 

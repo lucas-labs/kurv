@@ -1,6 +1,6 @@
 use anyhow::Ok;
 
-use self::cmd::wants_help;
+use self::cmd::{stop_start::StopStartAction, wants_help};
 
 use {
     anyhow::{anyhow, Result},
@@ -35,7 +35,10 @@ pub fn dispatch_command() -> Result<DispatchResult> {
                 "list" | "l" | "ls" | "snaps" => {
                     cmd::list::run(&mut arguments).map(|_| DispatchResult::Dispatched)
                 }
-                "stop" => cmd::stop::run(&mut arguments).map(|_| DispatchResult::Dispatched),
+                "stop" => cmd::stop_start::run(&mut arguments, StopStartAction::Stop)
+                    .map(|_| DispatchResult::Dispatched),
+                "start" => cmd::stop_start::run(&mut arguments, StopStartAction::Start)
+                    .map(|_| DispatchResult::Dispatched),
                 _ => cmd::default::run(
                     &mut arguments,
                     Some(format!("Invalid usage | Command '{}' not recognized", subcmd).as_str()),
