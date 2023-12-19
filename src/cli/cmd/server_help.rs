@@ -8,16 +8,15 @@ use indoc::indoc;
 
 use {
     crate::cli::components::{Component, Help},
-    crate::printth
+    crate::printth,
 };
-
 
 pub fn print() {
     printth!(
         "{}",
         Help {
             command: "kurv server",
-            summary: Some(indoc!{"
+            summary: Some(indoc! {"
                 starts the <white>kurv</white> server and all its dependant eggs
 
                 <warn><b>!</b></warn> this command will <b>only</b> work if the environment

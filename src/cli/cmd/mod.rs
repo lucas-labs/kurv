@@ -1,10 +1,11 @@
 use pico_args::Arguments;
 
 mod api;
-pub mod stop_start;
+pub mod collect;
 pub mod default;
 pub mod list;
 pub mod server_help;
+pub mod stop_start;
 
 /// Returns true if the user wants help with the command
 pub fn wants_help(args: &mut Arguments) -> bool {

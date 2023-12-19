@@ -1,10 +1,10 @@
-use std::process::exit;
-
-use crate::{api, kurv::Egg, printth};
-
-use super::{Api, ParsedResponse, parse_response};
-use anyhow::{Result, anyhow};
-use api::eggs::EggsSummaryList;
+use {
+    super::{parse_response, Api, ParsedResponse},
+    crate::{api, kurv::Egg, printth},
+    anyhow::Result,
+    api::eggs::EggsSummaryList,
+    std::process::exit,
+};
 
 impl Api {
     pub fn eggs_summary(&self) -> Result<EggsSummaryList> {
@@ -14,17 +14,17 @@ impl Api {
         Ok(eggs_summary_list)
     }
 
-    pub fn stop_start_egg(&self, id: String, action: String) -> Result<Egg> {
-        let response = self.post(format!("/eggs/{id}/{action}").as_ref(), "")?;
+    pub fn eggs_post(&self, route: &str, body: &str) -> Result<Egg> {
+        let response = self.post(format!("/eggs{route}").as_ref(), body)?;
         let maybe_egg: ParsedResponse<Egg> = parse_response(&response)?;
-        
+
         match maybe_egg {
             ParsedResponse::Failure(err) => {
                 printth!("<error>[err: {}]</error> {}\n", err.code, err.message);
                 exit(1)
             }
 
-            ParsedResponse::Success(egg) => Ok(egg)
+            ParsedResponse::Success(egg) => Ok(egg),
         }
     }
 }

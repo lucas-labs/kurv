@@ -1,3 +1,5 @@
+pub mod load;
+
 use {
     chrono::prelude::*,
     chrono::Duration,
@@ -11,6 +13,7 @@ pub enum EggStatus {
     Pending,
     Running,
     Stopped,
+    PendingRemoval,
     Errored,
 }
 
@@ -21,6 +24,10 @@ pub struct Watch {
     except: Vec<String>,
 }
 
+fn default_pid() -> u32 {
+    0
+}
+
 /// defines the current state of an egg
 #[derive(PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct EggState {
@@ -28,6 +35,8 @@ pub struct EggState {
     pub start_time: Option<DateTime<Local>>,
     pub try_count: u32,
     pub error: Option<String>,
+
+    #[serde(default = "default_pid")]
     pub pid: u32,
 }
 
@@ -218,7 +227,10 @@ impl Egg {
 
     /// marks the `egg` as stopped by:
     pub fn set_as_stopped(&mut self) {
-        self.set_status(EggStatus::Stopped);
+        if !self.is_pending_removal() {
+            self.set_status(EggStatus::Stopped);
+        }
+
         self.set_pid(0);
         self.reset_try_count();
         self.set_start_time(None);
@@ -261,11 +273,21 @@ impl Egg {
         }
     }
 
-    /// checks if the `egg` is running
-    /// (if its state is `Running`).
+    /// checks if the `egg` is stopped
+    /// (if its state is `Stopped`).
     pub fn is_stopped(&self) -> bool {
         if let Some(ref egg_state) = self.state {
             egg_state.status == EggStatus::Stopped
+        } else {
+            false
+        }
+    }
+
+    /// checks if the `egg` is pending removal
+    /// (if its state is `PendingRemoval`).
+    pub fn is_pending_removal(&self) -> bool {
+        if let Some(ref egg_state) = self.state {
+            egg_state.status == EggStatus::PendingRemoval
         } else {
             false
         }

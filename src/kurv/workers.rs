@@ -93,11 +93,7 @@ impl Workers {
     }
 
     /// Removes a child from the given group (or the default group if `group == None`).
-    pub fn remove_child(
-        &mut self,
-        group: Option<&str>,
-        worker_id: String,
-    ) {
+    pub fn remove_child(&mut self, group: Option<&str>, worker_id: String) {
         let group = group.unwrap_or(DEFAULT_GROUP);
 
         let pool = self

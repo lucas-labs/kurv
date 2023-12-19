@@ -33,9 +33,15 @@ impl Router {
             ("GET", "/", status::status),
             ("GET", "/status", status::status),
             ("GET", "/eggs", eggs::summary),
+            ("POST", "/eggs", eggs::collect),
             ("GET", "/eggs/(?P<egg_id>[0-9]+)", eggs::get),
             ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/stop", eggs::stop),
             ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/start", eggs::start),
+            (
+                "POST",
+                "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/remove",
+                eggs::remove,
+            ),
             (".*", ".*", err::not_allowed), // last resort
         ]
     }

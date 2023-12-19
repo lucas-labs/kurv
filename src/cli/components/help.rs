@@ -1,5 +1,3 @@
-use crate::common::str::ToString;
-
 use super::{Component, Logo};
 
 static SUMMARY: &str = "{summary}";

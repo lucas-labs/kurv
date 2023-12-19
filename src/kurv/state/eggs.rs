@@ -4,7 +4,7 @@ use {super::KurvState, crate::kurv::egg::Egg};
 
 impl KurvState {
     /// 🥚 ⇝ adds a new `egg` to the state and **returns** its assigned `id`
-    pub fn collect(&mut self, mut egg: Egg) -> usize {
+    pub fn collect(&mut self, egg: &Egg) -> usize {
         // from self.eggs find the one with the highest egg.id
         let next_id = self
             .eggs
@@ -14,8 +14,9 @@ impl KurvState {
             .unwrap_or(0)
             + 1;
 
-        egg.id = Some(next_id);
-        self.eggs.insert(egg.name.clone(), egg);
+        let mut new_egg = egg.clone();
+        new_egg.id = Some(next_id);
+        self.eggs.insert(egg.name.clone(), new_egg);
 
         next_id
     }
@@ -103,63 +104,10 @@ impl KurvState {
         None
     }
 
-    // /// 🥚 ⇝ retrieves the `egg` with the given token; the token can be:
-    // ///   - the internal id of the egg
-    // ///   - the pid of the running egg
-    // ///   - the name (key) of the egg
-    // pub fn get_mut(&mut self, token: String) -> Option<&mut Egg> {
-    //     let mut maybe_egg: Option<&mut Egg> = None;
-
-    //     // // since we receive a string, we will search by name first to avoid
-    //     // // innecesary conversions
-    //     // if let Some(egg) = self.get_by_name_mut(token.as_str()) {
-    //     //     // return Some(egg);
-    //     //     maybe_egg = Some(egg);
-    //     // }
-
-    //     // // if we couldn't find it by name, we try by id
-    //     // if let Some(id) = token.parse::<usize>().ok() {
-    //     //     if let Some(egg) = self.get_by_id_mut(id) {
-    //     //         maybe_egg = Some(egg);
-    //     //     }
-    //     // }
-
-    //     // // and at last, we try by pid
-    //     // if let Some(pid) = token.parse::<u32>().ok() {
-    //     //     if let Some(egg) = self.get_by_pid_mut(pid) {
-    //     //         maybe_egg = Some(egg);
-    //     //     }
-    //     // }
-
-    //     let mut maybe: Option<&mut Egg> = {
-    //         // if let Some(egg) = self.get_by_name_mut(token.as_str()) {
-    //         //     // return Some(egg);
-    //         //     return Some(egg);
-    //         // }
-
-    //             // if we couldn't find it by name, we try by id
-    //         if let Some(id) = token.parse::<usize>().ok() {
-    //             if let Some(egg) = self.get_by_id_mut(id) {
-    //                 let mut mut_egg = egg.clone();
-    //                 return Some(&mut mut_egg);
-    //             }
-    //         }
-
-    //         // // and at last, we try by pid
-    //         // if let Some(pid) = token.parse::<u32>().ok() {
-    //         //     if let Some(egg) = self.get_by_pid_mut(pid) {
-    //         //         return Some(egg);
-    //         //     }
-    //         // }
-
-
-    //         None
-    //     };
-
-    //     // wrong token probably =)
-    //     // maybe_egg
-    //     None
-    // }
+    // 🥚 ⇝ returns `true` if there's an agg with name `key`
+    pub fn contains_key(&self, key: String) -> bool {
+        self.eggs.contains_key(&key)
+    }
 
     /// 🥚 ⇝ removes the egg with the given `name` from the state, and returns it
     ///

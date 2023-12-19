@@ -1,14 +1,13 @@
 mod eggs;
 
-use std::io::{Read, Write};
-use std::net::TcpStream;
-use std::str;
-
-use anyhow::{anyhow, Result};
-use serde::Deserialize;
-
-use crate::common::tcp::ErrorResponse;
-use crate::kurv::Egg;
+use {
+    crate::common::tcp::ErrorResponse,
+    anyhow::{anyhow, Result},
+    serde::Deserialize,
+    std::io::{Read, Write},
+    std::net::TcpStream,
+    std::str,
+};
 
 // ApiResponse struct to hold response headers and body
 pub(crate) struct ApiResponse {
@@ -95,7 +94,7 @@ pub enum ParsedResponse<T> {
 }
 
 /// parses a response from the server api.
-/// 
+///
 /// It returns a `ParsedResponse` that can either be a success call of type `T`
 /// or a failure of type `ErrorResponse`
 pub fn parse_response<'a, T: Deserialize<'a>>(

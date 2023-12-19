@@ -28,6 +28,17 @@ pub fn run(args: &mut Arguments) -> Result<()> {
     let api = Api::new();
     let eggs_summary_list = api.eggs_summary()?;
 
+    if eggs_summary_list.0.len() == 0 {
+        printth!(indoc! {
+            "\nthere are no 🥚 in the kurv <warn>=(</warn>
+                
+            <head>i</head> collect some <b>eggs</b> to get started:
+              <dim>$</dim> <white>kurv</white> collect <green>my-egg.kurv</green>
+            "
+        });
+        return Ok(());
+    }
+
     printth!("\n<white>🥚</white> <dim>eggs snapshot</dim>\n");
 
     let rows: Vec<Vec<CellStruct>> = eggs_summary_list
@@ -107,15 +118,17 @@ fn color_by_status(status: EggStatus) -> Option<Color> {
         EggStatus::Errored => Some(Color::Red),
         EggStatus::Stopped => Some(Color::Yellow),
         EggStatus::Pending => Some(Color::Blue),
+        EggStatus::PendingRemoval => Some(Color::Magenta),
     }
 }
 
 fn dim_by_status(status: EggStatus) -> bool {
     match status {
+        EggStatus::PendingRemoval => true,
+        EggStatus::Pending => true,
         EggStatus::Running => false,
         EggStatus::Errored => false,
         EggStatus::Stopped => false,
-        EggStatus::Pending => true,
     }
 }
 

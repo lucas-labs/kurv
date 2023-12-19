@@ -1,9 +1,8 @@
 use {
+    super::Context,
     crate::common::tcp::{json, Request, Response},
     anyhow::Result,
-    super::Context,
 };
-
 
 pub fn status(_request: &Request, ctx: &Context) -> Result<Response> {
     let info = ctx.info.clone();

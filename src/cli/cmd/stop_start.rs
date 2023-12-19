@@ -3,7 +3,7 @@ use indoc::formatdoc;
 
 use {
     crate::cli::{
-        cmd::{api::Api, wants_help, is_option_or_flag},
+        cmd::{api::Api, is_option_or_flag, wants_help},
         components::{Component, Help},
     },
     crate::printth,
@@ -15,7 +15,8 @@ use {
 /// indicates wether we want to stop or start an egg
 pub enum StopStartAction {
     Stop,
-    Start
+    Start,
+    Remove,
 }
 
 struct Strings<'a> {
@@ -24,12 +25,11 @@ struct Strings<'a> {
     past_action: &'a str,
 }
 
-
 /// stops a runnig egg
-/// 
-/// IDEA: it works asynchronously, this means that ehen the command 
+///
+/// IDEA: it works asynchronously, this means that ehen the command
 /// ends, the egg might still be running. We could implement a --timeout X
-/// option that will check the actual status of the egg until it IS actually 
+/// option that will check the actual status of the egg until it IS actually
 /// Stopped (has no pid), or reaches timeouts (in which case it should end
 /// with an error exit code)
 pub fn run(args: &mut Arguments, action: StopStartAction) -> Result<()> {
@@ -40,41 +40,49 @@ pub fn run(args: &mut Arguments, action: StopStartAction) -> Result<()> {
     }
 
     let api = Api::new();
-    let cmd_arg: Result<Option<String>> = args.opt_free_from_str().map_err(|_| anyhow!("wrong usage"));
+    let cmd_arg: Result<Option<String>> =
+        args.opt_free_from_str().map_err(|_| anyhow!("wrong usage"));
 
     match cmd_arg {
-        Ok(maybe_arg) => {
-            match maybe_arg {
-                Some(id) => {
-                    if is_option_or_flag(&id) {
-                        return Err(anyhow!("wrong usage"));
-                    }
+        Ok(maybe_arg) => match maybe_arg {
+            Some(id) => {
+                if is_option_or_flag(&id) {
+                    return Err(anyhow!("wrong usage"));
+                }
 
-                    printth!("\n<white>🥚</white> <dim>{} egg {}</dim>\n", strings.doing_action, id);
+                printth!(
+                    "\n<white>🥚</white> <dim>{} egg {}</dim>\n",
+                    strings.doing_action,
+                    id
+                );
 
-                    let response = api.stop_start_egg(id, strings.action.to_string());
+                let response = api.eggs_post(
+                    format!("/{}/{}", id, strings.action.to_string()).as_str(),
+                    "",
+                );
 
-                    match response {
-                        Ok(egg) => {
-                            printth!(indoc! {
+                match response {
+                    Ok(egg) => {
+                        printth!(
+                            indoc! {
                                 "egg <green>{}</green> has been scheduled to be {}
                                  
                                 <head><b>i</b></head> you can check its status by running:
-                                  <dim>$</dim> <white><b>kurv</b></white> stat <green>1</green>
+                                  <dim>$</dim> <white><b>kurv</b></white> egg <green>1</green>
                                 "
-                            }, strings.past_action, egg.name);
-                        },
-                        _ => {}
+                            },
+                            strings.past_action,
+                            egg.name
+                        );
                     }
+                    _ => {}
+                }
 
-                    Ok(())
-                }
-                None => {
-                    help(strings)
-                }
+                Ok(())
             }
-        }
-        Err(e) => Err(e)
+            None => help(strings),
+        },
+        Err(e) => Err(e),
     }
 }
 
@@ -107,18 +115,22 @@ fn help(strings: Strings) -> Result<()> {
     Ok(())
 }
 
-
 fn get_strings<'a>(action: StopStartAction) -> Strings<'a> {
     match action {
         StopStartAction::Start => Strings {
             action: "start",
             doing_action: "starting",
-            past_action: "started"
+            past_action: "started",
         },
         StopStartAction::Stop => Strings {
             action: "stop",
             doing_action: "stopping",
-            past_action: "stopped"
-        }
+            past_action: "stopped",
+        },
+        StopStartAction::Remove => Strings {
+            action: "remove",
+            doing_action: "removing",
+            past_action: "removed",
+        },
     }
 }

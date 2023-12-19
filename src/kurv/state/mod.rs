@@ -2,6 +2,7 @@ pub mod eggs;
 
 use {
     super::egg::Egg,
+    crate::common::str::ToString,
     anyhow::Context,
     anyhow::Result,
     log::debug,
@@ -53,6 +54,9 @@ impl KurvState {
     pub fn save(&self, path: &PathBuf) -> Result<()> {
         let serialized = serde_yaml::to_string(&self)?;
         std::fs::write(path, serialized)?;
+
+        let trim: &[_] = &['\r', '\n'];
+        debug!("saving state to {}", path.str().trim_matches(trim));
 
         Ok(())
     }

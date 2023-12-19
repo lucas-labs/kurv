@@ -1,9 +1,8 @@
-use log::trace;
-
 mod pool;
 
 use {
-    serde::{Serialize, Deserialize},
+    log::trace,
+    serde::{Deserialize, Serialize},
     serde_yaml,
     std::{
         collections::HashMap,
@@ -14,7 +13,7 @@ use {
 };
 
 /// List of common HTTP methods mapped to their string representations.
-const RESPONSE_CODES: [(u16, &str); 13] = [
+const RESPONSE_CODES: [(u16, &str); 14] = [
     (200, "OK"),
     (201, "Created"),
     (202, "Accepted"),
@@ -24,6 +23,7 @@ const RESPONSE_CODES: [(u16, &str); 13] = [
     (403, "Forbidden"),
     (404, "Not Found"),
     (405, "Method Not Allowed"),
+    (409, "Conflict"),
     (418, "I'm a teapot"),
     (500, "Internal Server Error"),
     (501, "Not Implemented"),

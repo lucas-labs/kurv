@@ -2,14 +2,15 @@ use {
     super::{egg::EggPaths, *},
     chrono::Duration,
     command_group::GroupChild,
-    log::{debug, warn, error},
+    log::{debug, error, warn},
 };
 
 impl Kurv {
     /// try to spawn all eggs that are in `Pending` or `Errored` state
-    pub(crate) fn spawn_all(&mut self) {
+    pub(crate) fn spawn_all(&mut self) -> bool {
         let state = self.state.clone();
         let mut state = state.lock().unwrap();
+        let mut unsynced = false;
 
         let mut eggs = state.eggs.clone();
         for (key, egg) in eggs.iter_mut() {
@@ -26,15 +27,20 @@ impl Kurv {
                     self.workers
                         .add_child(None, key.clone(), egg.id.unwrap(), child);
                 }
+
+                unsynced = true;
             }
         }
+
+        unsynced
     }
 
     /// checks each eggs looking for those that have finished running unexpectedly
     /// and sets their state accordingly. Also keeps re-try count updated
-    pub(crate) fn check_running_eggs(&mut self) {
+    pub(crate) fn check_running_eggs(&mut self) -> bool {
         let state = self.state.clone();
         let mut state = state.lock().unwrap();
+        let mut unsynced: bool = false;
 
         for (_, egg) in state.eggs.iter_mut() {
             // if the egg is not running, then it was probably already checked
@@ -79,6 +85,7 @@ impl Kurv {
                         );
 
                         egg.set_as_errored(exit_err_msg);
+                        unsynced = true
                     }
                     Err(e) => {
                         error!("error while waiting for child process {}: {}", id, e);
@@ -87,6 +94,8 @@ impl Kurv {
                 }
             }
         }
+
+        unsynced
     }
 
     /// spawns the given `egg` and adds it to the `workers` list

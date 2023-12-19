@@ -28,11 +28,21 @@ pub struct Paths {
 /// General information about the app
 #[derive(PartialEq, Eq, Clone, Deserialize, Serialize)]
 pub struct Info {
-    /// the process id of the application
-    pub pid: u32,
+    /// the version of the application
+    pub name: String,
 
     /// the version of the application
     pub version: String,
+
+    /// the version compilation name
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version_name: Option<&'static str>,
+
+    /// description
+    pub description: String,
+
+    /// the process id of the application
+    pub pid: u32,
 
     /// important paths for the application
     pub paths: Paths,
@@ -42,8 +52,11 @@ impl Info {
     /// Creates a new instance of Info
     pub fn new() -> Info {
         Info {
-            pid: std::process::id(),
+            name: env!("CARGO_PKG_NAME").to_string(),
             version: env!("CARGO_PKG_VERSION").to_string(),
+            version_name: option_env!("KURV_VERSION_NAME"),
+            description: env!("CARGO_PKG_DESCRIPTION").to_string(),
+            pid: std::process::id(),
             paths: Info::get_paths().expect("could not get paths"),
         }
     }

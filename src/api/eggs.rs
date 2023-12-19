@@ -1,12 +1,14 @@
-use crate::common::{duration::humanize_duration, str::ToString};
-
 use {
+    super::err,
+    super::Context,
     crate::common::tcp::{json, Request, Response},
     crate::kurv::EggStatus,
-    super::Context,
-    super::err,
+    crate::{
+        common::{duration::humanize_duration, str::ToString},
+        kurv::{Egg, EggState},
+    },
     anyhow::{anyhow, Result},
-    serde::{Serialize, Deserialize},
+    serde::{Deserialize, Serialize},
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -30,7 +32,7 @@ pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
     let state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
     let eggs = state.eggs.clone();
     let mut summary_list = Vec::new();
-    
+
     for (_, egg) in eggs.iter() {
         let summary = EggSummary {
             id: match egg.id {
@@ -44,7 +46,7 @@ pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
             name: egg.name.clone(),
             status: match egg.state {
                 Some(ref state) => state.status.clone(),
-                None => EggStatus::Stopped,
+                None => EggStatus::Pending,
             },
             uptime: match egg.state {
                 Some(ref state) => {
@@ -55,7 +57,7 @@ pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
                     } else {
                         "-".to_string()
                     }
-                },
+                }
                 None => "-".to_string(),
             },
             retry_count: match egg.state {
@@ -86,7 +88,6 @@ pub fn get(request: &Request, ctx: &Context) -> Result<Response> {
     Ok(err(400, WRONG_ID_MSG.to_string()))
 }
 
-
 /// tries to stop a running egg
 pub fn stop(request: &Request, ctx: &Context) -> Result<Response> {
     set_status(request, ctx, EggStatus::Stopped)
@@ -95,6 +96,11 @@ pub fn stop(request: &Request, ctx: &Context) -> Result<Response> {
 /// tries to stop a running egg
 pub fn start(request: &Request, ctx: &Context) -> Result<Response> {
     set_status(request, ctx, EggStatus::Pending)
+}
+
+/// tries to remove an egg
+pub fn remove(request: &Request, ctx: &Context) -> Result<Response> {
+    set_status(request, ctx, EggStatus::PendingRemoval)
 }
 
 /// changes the status of an egg to Stopped or Pending
@@ -111,16 +117,28 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
                         match egg.state.clone() {
                             Some(state) => {
                                 if state.status != EggStatus::Stopped {
-                                    return Ok(err(400, format!("egg {} is already running", egg.name)));
+                                    return Ok(err(
+                                        400,
+                                        format!("egg {} is already running", egg.name),
+                                    ));
                                 }
-                            },
+                            }
                             _ => {}
-                        }                        
-                    },
-                    EggStatus::Stopped => {},
-                    _ => return Ok(err(400, format!("can't change status to '{}'", status.str())))
+                        }
+                    }
+                    EggStatus::Stopped => {}
+                    EggStatus::PendingRemoval => {}
+                    _ => {
+                        let trim: &[_] = &['\r', '\n'];
+                        return Ok(err(
+                            400,
+                            format!(
+                                "can't change status to '{}'",
+                                status.str().trim_matches(trim)
+                            ),
+                        ));
+                    }
                 };
-    
 
                 egg.set_status(status);
                 return Ok(json(200, egg.clone()));
@@ -131,4 +149,47 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
     }
 
     Ok(err(400, WRONG_ID_MSG.to_string()))
+}
+
+/// changes the status of an egg to Stopped or Pending
+pub fn collect(request: &Request, ctx: &Context) -> Result<Response> {
+    let maybe_egg: Result<Egg, _> = serde_json::from_str(&request.body);
+
+    match maybe_egg {
+        Ok(mut egg) => {
+            let state = ctx.state.clone();
+            let mut state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
+
+            if state.contains_key(egg.name.clone()) {
+                return Ok(err(
+                    409,
+                    format!("An egg with name {} already exists", egg.name.clone()),
+                ));
+            }
+
+            // set egg state as pendig
+            let egg_state = match egg.state.clone() {
+                Some(state) => {
+                    let mut new_state = state.clone();
+                    new_state.status = EggStatus::Pending;
+
+                    new_state
+                }
+                None => EggState {
+                    status: EggStatus::Pending,
+                    start_time: None,
+                    try_count: 0,
+                    error: None,
+                    pid: 0,
+                },
+            };
+
+            egg.state = Some(egg_state);
+            let id = state.collect(&egg);
+            egg.id = Some(id);
+
+            Ok(json(200, egg))
+        }
+        Err(error) => Ok(err(400, format!("Invalid egg: {}", error))),
+    }
 }
