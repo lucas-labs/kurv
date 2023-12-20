@@ -7,6 +7,10 @@
 
 <p align="center">${\normalsize \textbf{kurv}}$ is a process manager, mainly for node.js and python applications. It's written in <code>rust</code>. It deamonizes your apps so that they can run in the background. It also restarts them if they crash.</p>
 
+<br>
+<br>
+<br>
+
 > [!WARNING]  
 > This project is not ready for production use:
 >   - I created this project because I needed a process manager for my apps and because I wanted to learn rust. This is my first rust project.
