@@ -23,7 +23,11 @@ pub fn print() {
                 variable <white>KURV_SERVER</white> is setted to `true`"
             }),
             error: None,
-            options: None,
+            options: Some(vec![(
+                "--force",
+                vec![],
+                "bypass the KURV_SERVER env var check"
+            )]),
             subcommands: None,
         }
         .render()

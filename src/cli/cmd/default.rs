@@ -35,7 +35,7 @@ fn help(err: Option<&str>) {
                 <white><b>!</b></white> you can also use <white>kurv [command] --help</white> to get 
                 help information about a specific command.
                 
-                <white>⇝</white>  <dim>example</dim>
+                <dim><white><b>»</b></white> example</dim>
                 
                 <dim>$</dim> <white>kurv</white> server <dim>--help</dim>"
             }),
@@ -49,6 +49,8 @@ fn help(err: Option<&str>) {
                 ("list", vec!["l"], "prints eggs list and their statuses"),
                 ("stop", vec![], "stops a running egg"),
                 ("start", vec![], "starts a stopped egg"),
+                ("remove", vec![], "removes an egg"),
+                ("collect", vec![], "collects and starts a new egg"),
             ]),
         }
         .render()

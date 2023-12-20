@@ -9,7 +9,7 @@ use {
     velcro::hash_map_from,
 };
 
-/// 🎨 ⇝ returns the theme of the application
+/// 🎨 » returns the theme of the application
 pub fn get_theme() -> Theme {
     Theme::new(hash_map_from! {
         "head": [

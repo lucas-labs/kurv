@@ -35,10 +35,10 @@ impl log::Log for Logger {
 
         match record.level() {
             Level::Info => {
-                printth!("<dim>{}</dim> <{thm}>⇝</{thm}>  {}", date, record.args());
+                printth!("<dim>{}</dim> <{thm}>»</{thm}> {}", date, record.args());
             }
             _ => {
-                printth!("<dim>{}</dim> <{thm}>⇝  {}</{thm}>", date, record.args());
+                printth!("<dim>{}</dim> <{thm}>» {}</{thm}>", date, record.args());
             }
         }
     }

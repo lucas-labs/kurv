@@ -8,6 +8,7 @@
 		"terminal.integrated.env.windows": {
 			// allows to run kurv command in terminal for development purposes
 			"PATH": "${workspaceFolder}/target/debug;${env:PATH}",
+			"KURV_SERVER": "true",
 			"KURV_HOME": "${workspaceFolder}"
 		}
 	}

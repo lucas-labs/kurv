@@ -55,7 +55,7 @@ pub struct EggPaths {
     pub stderr: PathBuf,
 }
 
-/// 🥚 ⇝ an egg represents a process that can be started and stopped by kurv
+/// 🥚 » an egg represents a process that can be started and stopped by kurv
 #[derive(PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Egg {
     pub command: String,
