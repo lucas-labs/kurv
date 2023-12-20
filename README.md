@@ -5,7 +5,7 @@
 <br>
 
 
-<p align="center">${\normalsize \textbf{kurv}}$ is a process manager, mainly for node.js and python applications. It's written in <code>rust</code>. It deamonizes your apps so that they can run in the background. It also restarts them if they crash.</p>
+<p align="center">${\normalsize \textbf{kurv}}$ is a process manager, mainly for Node.js and Python applications. It's written in <code>Rust</code>. It daemonizes your apps so that they can run in the background. It also restarts them if they crash.</p>
 
 <br>
 <br>
@@ -13,21 +13,22 @@
 
 > [!WARNING]  
 > This project is not ready for production use:
->   - I created this project because I needed a process manager for my apps and because I wanted to learn rust. This is my first rust project.
+>   - I created this project because I needed a process manager for my apps and because I wanted to learn Rust. This is my first Rust project.
 >   - No tests (yet)
->   - Only tested on win-11
->   - I'm not a rust expert!
->   - I'm using it for my own projects, but it haven't been tested on a large scale
+>   - Only tested on Windows 11
+>   - I'm not a Rust expert!
+>   - I'm using it for my own projects, but it hasn't been tested on a large scale
+
 
 ## Why `kurv`?
-`kurv` means "basket" in many languages. For example in norwegian (I'm not Norweigan, but I liked the word 😄). Think of `kurv` as a basket for your apps. In `kurv`, we call each deployed app an `egg`. So, let's go and collect some eggs 🥚 in your basket 🧺.
+`kurv` means "basket" in many languages. For example, in Norwegian (I'm not Norwegian, but I liked the word 😄). Think of `kurv` as a basket for your apps. In `kurv`, we call each deployed app an `egg`. So, let's go and collect some eggs 🥚 in your basket 🧺.
 
 ## Installation
 
-Download the latest realease from github. 
+Download the latest release from GitHub. 
 
 > [!INFO] 
-> `kurv` can run either as a server or as a cli client, using the same binary. 
+> `kurv` can run either as a server or as a CLI client, using the same binary. 
 
 ## Start the server
 
@@ -47,7 +48,7 @@ kurv server
 > to run it as a server, you need to set the `KURV_SERVER` environment
 > to `true`. This is just a safety measure to prevent you from running
 > the server when you actually want to run the client.
-> To bypass this, you can use the `--force` flag.
+> To bypass this, you can use the `--force` flag (`kurv server --force`)
 
 ## Collect some 🥚
 To collect an egg (deploy/start/deamonize an app), run:
@@ -56,7 +57,7 @@ To collect an egg (deploy/start/deamonize an app), run:
 kurv collect <egg-cfg-path>
 ```
 
-The path should point to a yaml file that contains the configuration for the egg. The configuration file should look like this:
+The path should point to a YAML file that contains the configuration for the egg. The configuration file should look like this:
 
 ```yaml title="myegg.kurv"
 name: fastapi # the name of the egg / should be unique
@@ -75,9 +76,9 @@ If for some reason, the command/program exits, `kurv` will try to restart it.
 
 ## Show me my eggs
 
-If you want to a summary of your eggs, their state, etc, run:
+If you want a summary of your eggs, their state, etc., run:
 
-``` sh
+```zsh
 $ kurv list
 
 🥚 eggs snapshot
@@ -106,7 +107,7 @@ If you want to stop an egg, run:
 $ kurv stop <egg:name|id|pid>
 ```
 
-This will not remove the egg, it will just stop the process.
+This will not remove the egg; it will just stop the process.
 
 ## Remove an egg
 
