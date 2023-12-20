@@ -26,7 +26,6 @@ cli-table = "0.4.7"
 command-group = "5.0.1"
 crossterm = "0.27.0"
 form_urlencoded = "1.2.1"
-getargs = "0.5.0"
 htmlparser = "0.1.1"
 indoc = "2.0.4"
 log = "0.4.20"
@@ -36,14 +35,3 @@ serde = { version = "1.0.193", features = ["derive"] }
 serde_json = "1.0.108"
 serde_yaml = "0.9.27"
 velcro = "0.5.4"
-
-# --- Platform specific dependencies ---
-# Windows
-# [target.'cfg(windows)'.dependencies]
-# winapi = { version = "0.3", features = [
-#   # "tlhelp32",
-#   "errhandlingapi",
-#   # "processthreadsapi",  
-#   # "minwindef",
-#   # "impl-default",
-# ] }

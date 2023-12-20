@@ -1,6 +1,8 @@
-use anyhow::{anyhow, Result};
-
-use {super::KurvState, crate::kurv::egg::Egg};
+use {
+    super::KurvState,
+    crate::kurv::egg::Egg,
+    anyhow::{anyhow, Result},
+};
 
 impl KurvState {
     /// 🥚 » adds a new `egg` to the state and **returns** its assigned `id`
@@ -22,7 +24,7 @@ impl KurvState {
     }
 
     /// 🥚 » retrieves the egg with the given `id` from the state
-    pub fn get_by_id(&self, id: usize) -> Option<&Egg> {
+    pub fn get(&self, id: usize) -> Option<&Egg> {
         for (_, e) in self.eggs.iter() {
             if e.id == Some(id) {
                 return Some(e);
@@ -33,31 +35,9 @@ impl KurvState {
     }
 
     /// 🥚 » retrieves the egg with the given `id` from the state as a mutable reference
-    pub fn get_by_id_mut(&mut self, id: usize) -> Option<&mut Egg> {
+    pub fn get_mut(&mut self, id: usize) -> Option<&mut Egg> {
         for (_, e) in self.eggs.iter_mut() {
             if e.id == Some(id) {
-                return Some(e);
-            }
-        }
-
-        None
-    }
-
-    /// 🥚 » retrieves the egg with the given `state.pid` from the state
-    pub fn get_by_pid(&self, pid: u32) -> Option<&Egg> {
-        for (_, e) in self.eggs.iter() {
-            if e.state.is_some() && e.state.as_ref().unwrap().pid == pid {
-                return Some(e);
-            }
-        }
-
-        None
-    }
-
-    /// 🥚 » retrieves the egg with the given `state.pid` from the state as a mutable reference
-    pub fn get_by_pid_mut(&mut self, pid: u32) -> Option<&mut Egg> {
-        for (_, e) in self.eggs.iter_mut() {
-            if e.state.is_some() && e.state.as_ref().unwrap().pid == pid {
                 return Some(e);
             }
         }
@@ -70,37 +50,14 @@ impl KurvState {
         self.eggs.get(name)
     }
 
-    /// 🥚 » retrieves the egg with the given `name` from the state as a mutable reference
-    pub fn get_by_name_mut(&mut self, name: &str) -> Option<&mut Egg> {
-        self.eggs.get_mut(name)
-    }
-
-    /// 🥚 » retrieves the `egg` with the given token; the token can be:
-    ///   - the internal id of the egg
-    ///   - the pid of the running egg
-    ///   - the name (key) of the egg
-    pub fn get(&self, token: String) -> Option<&Egg> {
-        // since we receive a string, we will search by name first to avoid
-        // innecesary conversions
-        if let Some(egg) = self.get_by_name(token.as_str()) {
-            return Some(egg);
-        }
-
-        // if we couldn't find it by name, we try by id
-        if let Some(id) = token.parse::<usize>().ok() {
-            if let Some(egg) = self.get_by_id(id) {
-                return Some(egg);
+    /// 🥚 » retrieves the egg with the given `pid` from the state
+    pub fn get_by_pid(&self, pid: u32) -> Option<&Egg> {
+        for (_, e) in self.eggs.iter() {
+            if e.state.is_some() && e.state.as_ref().unwrap().pid == pid {
+                return Some(e);
             }
         }
 
-        // and at last, we try by pid
-        if let Some(pid) = token.parse::<u32>().ok() {
-            if let Some(egg) = self.get_by_pid(pid) {
-                return Some(egg);
-            }
-        }
-
-        // wrong token probably =)
         None
     }
 
@@ -109,38 +66,55 @@ impl KurvState {
         self.eggs.contains_key(&key)
     }
 
+    /// 🥚 » retrieves the `egg.id` with the given token; the token can be:
+    ///   - the id of the egg (as a string)
+    ///   - the pid of the running egg
+    ///   - the name (key) of the egg
+    pub fn get_id_by_token(&self, token: &str) -> Option<usize> {
+        // Try to parse the token as usize to check if it's an id
+        if let Ok(id) = token.parse::<usize>() {
+            if let Some(egg) = self.get(id) {
+                return egg.id;
+            }
+        }
+
+        // Try to find an egg with the given pid and return its id
+        if let Ok(pid) = token.parse::<u32>() {
+            if let Some(egg) = self.get_by_pid(pid) {
+                return egg.id;
+            }
+        }
+
+        // Check if the token corresponds to an egg name and return its id
+        if let Some(egg) = self.get_by_name(&token) {
+            return egg.id;
+        }
+
+        // If no match found, return None
+        None
+    }
+
     /// 🥚 » removes the egg with the given `name` from the state, and returns it
     ///
     /// **warn:** this will raise an error if the egg is still running. So, make sure to
     /// kill it first.
-    pub fn remove(&mut self, name: &str) -> Result<Egg> {
-        if let Some(egg) = self.get_by_name(name).cloned() {
+    pub fn remove(&mut self, id: usize) -> Result<Egg> {
+        if let Some(egg) = self.get(id).cloned() {
             // check that egg.state.pid is None
             if let Some(state) = egg.state.clone() {
                 if state.pid > 0 {
                     return Err(anyhow!(
                         "Egg '{}' is still running with pid {}, please stop it first",
-                        name,
+                        egg.name,
                         state.pid
                     ));
                 }
             }
 
-            self.eggs.remove(name);
+            self.eggs.remove(&egg.name);
             Ok(egg)
         } else {
-            Err(anyhow!("Egg with name '{}' not found", name))
-        }
-    }
-
-    /// 🥚 » stops an egg
-    pub fn stop(&mut self, name: &str) -> Result<Egg> {
-        if let Some(egg) = self.get_by_name_mut(name) {
-            // check that egg.state.pid is None
-            egg.set_as_stopped();
-            Ok(egg.clone())
-        } else {
-            Err(anyhow!("Egg with name '{}' not found", name))
+            Err(anyhow!("Egg with id '{}' not found", id))
         }
     }
 }

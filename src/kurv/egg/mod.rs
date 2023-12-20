@@ -18,13 +18,6 @@ pub enum EggStatus {
     Errored,
 }
 
-/// defines the watch section of an egg
-#[derive(PartialEq, Eq, Clone, Serialize, Deserialize)]
-pub struct Watch {
-    on: Vec<String>,
-    except: Vec<String>,
-}
-
 fn default_pid() -> u32 {
     0
 }
@@ -68,11 +61,6 @@ pub struct Egg {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<EggState>,
-
-    /// files to watch for changes that will trigger a restart
-    /// TODO: not yet implemented
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub watch: Option<Watch>,
 
     /// arguments to be passed to the command
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -244,7 +232,6 @@ impl Egg {
         self.set_pid(0);
         self.set_start_time(None);
     }
-    
 
     /// checks if the `egg` should be spawned
     /// (if its state is `Pending` or `Errored`).

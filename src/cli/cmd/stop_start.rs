@@ -91,16 +91,16 @@ fn help(strings: Strings) -> Result<()> {
     printth!(
         "{}",
         Help {
-            command: "kurv stop",
+            command: format!("kurv {}", strings.action).as_ref(),
             summary: Some(formatdoc! {
                 "schedules an egg to be {} by the kurv server
                 
                 <head><b>example:</b></head>
-                  <dim>-> if we want to {} egg #<green>1</green> (you can use <white>kurv list</white>
-                  to check ids):</dim>
-                  
-                  <dim>$</dim> <white><b>kurv</b></white> {} <green>1</green>",
+                    <dim>$</dim> <white><b>kurv</b></white> {} <green>1</green>           <dim># by id</dim>
+                    <dim>$</dim> <white><b>kurv</b></white> {} <green>myprocess</green>   <dim># by name</dim>
+                    <dim>$</dim> <white><b>kurv</b></white> {} <green>9778</green>        <dim># by pid</dim>",
                 strings.past_action,
+                strings.action,
                 strings.action,
                 strings.action,
             }.as_ref()),

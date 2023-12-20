@@ -11,6 +11,7 @@ use {
 
 // ApiResponse struct to hold response headers and body
 pub(crate) struct ApiResponse {
+    #[allow(dead_code)]
     pub headers: String,
     pub body: String,
 }
@@ -25,7 +26,7 @@ impl Api {
     pub fn new() -> Self {
         let host = std::env::var("KURV_API_HOST").unwrap_or("127.0.0.1".to_string());
         let port = std::env::var("KURV_API_PORT")
-            .unwrap_or("5878".to_string())
+            .unwrap_or("58787".to_string())
             .parse::<u16>()
             .unwrap_or(5878);
 
@@ -78,11 +79,13 @@ impl Api {
     }
 
     // Method to perform HTTP PUT request
+    #[allow(dead_code)]
     pub(crate) fn put(&self, path: &str, body: &str) -> Result<ApiResponse> {
         self.request("PUT", path, Some(body))
     }
 
     // Method to perform HTTP DELETE request
+    #[allow(dead_code)]
     pub(crate) fn delete(&self, path: &str) -> Result<ApiResponse> {
         self.request("DELETE", path, None)
     }

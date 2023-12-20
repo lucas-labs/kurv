@@ -12,6 +12,7 @@ fn hex_to_rgb(hex: &str) -> Result<Color, std::num::ParseIntError> {
 
 /// a single style item
 #[derive(Clone)]
+#[allow(dead_code)]
 pub enum StyleItem {
     Attr(Attribute),
     Rgb(&'static str),

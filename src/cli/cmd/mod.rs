@@ -3,6 +3,7 @@ use pico_args::Arguments;
 mod api;
 pub mod collect;
 pub mod default;
+pub mod egg;
 pub mod list;
 pub mod server_help;
 pub mod stop_start;

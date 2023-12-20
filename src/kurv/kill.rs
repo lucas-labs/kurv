@@ -38,14 +38,14 @@ impl Kurv {
                 // check if the egg is actually running when it shouldn't
                 match child.inner().try_wait() {
                     Ok(None) => {
-                        // it's still running, let's kill the mf    
+                        // it's still running, let's kill the mf
                         match child.kill() {
                             Err(ref e) if e.kind() == std::io::ErrorKind::InvalidData => {
                                 warn!("egg {} has already finished by itself.", egg.name);
                             }
                             Err(err) => {
                                 error!("error while stopping egg {}: {}", egg.name, err);
-                            },
+                            }
                             _ => {}
                         }
 
@@ -104,7 +104,7 @@ impl Kurv {
                 continue;
             }
 
-            let _ = state.remove(&egg.name);
+            let _ = state.remove(egg.id.unwrap());
 
             debug!("egg <green>{}</green> has been removed", egg.name);
             unsynced = true

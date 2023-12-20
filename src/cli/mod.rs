@@ -1,8 +1,5 @@
-use anyhow::Ok;
-
-use self::cmd::{stop_start::StopStartAction, wants_help};
-
 use {
+    self::cmd::{stop_start::StopStartAction, wants_help},
     anyhow::{anyhow, Result},
     pico_args::Arguments,
 };
@@ -35,6 +32,7 @@ pub fn dispatch_command() -> Result<DispatchResult> {
                 "list" | "l" | "ls" | "snaps" => {
                     cmd::list::run(&mut arguments).map(|_| DispatchResult::Dispatched)
                 }
+                "egg" => cmd::egg::run(&mut arguments).map(|_| DispatchResult::Dispatched),
                 "stop" => cmd::stop_start::run(&mut arguments, StopStartAction::Stop)
                     .map(|_| DispatchResult::Dispatched),
                 "start" => cmd::stop_start::run(&mut arguments, StopStartAction::Start)

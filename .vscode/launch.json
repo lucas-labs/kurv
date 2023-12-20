@@ -12,7 +12,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/${workspaceFolderBasename}.exe",
             "args": [
-                "server"
+                "server",
+                "--force"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

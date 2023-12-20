@@ -73,16 +73,19 @@ pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
 }
 
 pub fn get(request: &Request, ctx: &Context) -> Result<Response> {
-    if let Some(id) = request.path_params.get("egg_id") {
+    if let Some(token) = request.path_params.get("egg_id") {
         let state = ctx.state.clone();
         let state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
-        if let Some(id) = id.parse::<usize>().ok() {
-            if let Some(egg) = state.get_by_id(id) {
+
+        let id = state.get_id_by_token(token);
+
+        if let Some(id) = id {
+            if let Some(egg) = state.get(id) {
                 return Ok(json(200, egg.clone()));
             }
-
-            return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, id)));
         }
+
+        return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, token)));
     }
 
     Ok(err(400, WRONG_ID_MSG.to_string()))
@@ -110,12 +113,14 @@ pub fn restart(request: &Request, ctx: &Context) -> Result<Response> {
 
 /// changes the status of an egg to Stopped or Pending
 pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result<Response> {
-    if let Some(id) = request.path_params.get("egg_id") {
+    if let Some(token) = request.path_params.get("egg_id") {
         let state = ctx.state.clone();
         let mut state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
 
-        if let Some(id) = id.parse::<usize>().ok() {
-            if let Some(egg) = state.get_by_id_mut(id) {
+        let id = state.get_id_by_token(token);
+
+        if let Some(id) = id {
+            if let Some(egg) = state.get_mut(id) {
                 match status {
                     EggStatus::Pending => {
                         // we can only change to pending if its state is currently Stopped
@@ -149,9 +154,9 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
                 egg.set_status(status);
                 return Ok(json(200, egg.clone()));
             }
-
-            return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, id)));
         }
+
+        return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, token)));
     }
 
     Ok(err(400, WRONG_ID_MSG.to_string()))

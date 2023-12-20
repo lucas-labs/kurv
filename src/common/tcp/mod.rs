@@ -1,5 +1,3 @@
-mod pool;
-
 use {
     log::trace,
     serde::{Deserialize, Serialize},
@@ -101,15 +99,6 @@ pub fn err(status: u16, msg: String) -> Response {
             message: msg,
         },
     )
-}
-
-/// Returns a text response with the given body and status code.
-pub fn txt(status: u16, body: &str) -> Response {
-    Response {
-        status,
-        headers: vec!["Content-Type: text/plain".to_string()],
-        body: body.as_bytes().to_vec(),
-    }
 }
 
 /// Handles an incoming TCP connection stream.

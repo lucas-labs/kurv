@@ -34,15 +34,12 @@ impl Router {
             ("GET", "/status", status::status),
             ("GET", "/eggs", eggs::summary),
             ("POST", "/eggs", eggs::collect),
-            ("GET", "/eggs/(?P<egg_id>[0-9]+)", eggs::get),
-            ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/stop", eggs::stop),
-            ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/start", eggs::start),
-            ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/restart", eggs::restart),
-            (
-                "POST",
-                "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/remove",
-                eggs::remove,
-            ),
+            ("POST", "/eggs/(?P<egg_id>.*)/stop", eggs::stop),
+            ("POST", "/eggs/(?P<egg_id>.*)/start", eggs::start),
+            ("POST", "/eggs/(?P<egg_id>.*)/restart", eggs::restart),
+            ("POST", "/eggs/(?P<egg_id>.*)/remove", eggs::remove),
+            ("POST", "/eggs/(?P<egg_id>.*)/egg", eggs::remove),
+            ("GET", "/eggs/(?P<egg_id>.*)", eggs::get),
             (".*", ".*", err::not_allowed), // last resort
         ]
     }
@@ -107,7 +104,7 @@ impl Handler for Router {
 /// starts the api server
 pub fn start(info: InfoMtx, state: KurvStateMtx) {
     let host = std::env::var("KURV_API_HOST").unwrap_or("127.0.0.1".to_string());
-    let port = std::env::var("KURV_API_PORT").unwrap_or("5878".to_string());
+    let port = std::env::var("KURV_API_PORT").unwrap_or("58787".to_string());
     let listener = TcpListener::bind(format!("{}:{}", host, port)).unwrap();
 
     info!(

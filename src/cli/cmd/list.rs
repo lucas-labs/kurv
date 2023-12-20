@@ -131,14 +131,13 @@ fn dim_by_status(status: EggStatus) -> bool {
         EggStatus::Running => false,
         EggStatus::Errored => false,
         EggStatus::Stopped => false,
-        
     }
 }
 
 fn get_borders() -> (BorderBuilder, SeparatorBuilder) {
     let border = Border::builder()
-        .bottom(HorizontalLine::new('└', '┘', '┴', '─'))
-        .top(HorizontalLine::new('┌', '┐', '┬', '─'))
+        .bottom(HorizontalLine::new('╰', '╯', '┴', '─'))
+        .top(HorizontalLine::new('╭', '╮', '┬', '─'))
         .left(VerticalLine::new('│'))
         .right(VerticalLine::new('│'));
 
