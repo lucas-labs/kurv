@@ -1,7 +1,7 @@
 api:
   # the host and port that the API server will listen on
   host: localhost
-  port: 5878
+  port: 58787
 
   # if a request is made from any host that's not 
   # in the allow_hosts list, it will be rejected

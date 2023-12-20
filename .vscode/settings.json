@@ -13,7 +13,7 @@
         "check_size.py": true,
 
         // 📝 docs
-        "README.md": true,
+        // "README.md": true,
 
         // 🟦 vscode
         ".vscode": true,
