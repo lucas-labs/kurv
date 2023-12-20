@@ -118,17 +118,20 @@ fn color_by_status(status: EggStatus) -> Option<Color> {
         EggStatus::Errored => Some(Color::Red),
         EggStatus::Stopped => Some(Color::Yellow),
         EggStatus::Pending => Some(Color::Blue),
-        EggStatus::PendingRemoval => Some(Color::Magenta),
+        EggStatus::PendingRemoval => Some(Color::Red),
+        EggStatus::Restarting => Some(Color::Magenta),
     }
 }
 
 fn dim_by_status(status: EggStatus) -> bool {
     match status {
         EggStatus::PendingRemoval => true,
+        EggStatus::Restarting => true,
         EggStatus::Pending => true,
         EggStatus::Running => false,
         EggStatus::Errored => false,
         EggStatus::Stopped => false,
+        
     }
 }
 

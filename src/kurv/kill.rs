@@ -1,3 +1,5 @@
+use log::warn;
+
 use {
     super::Kurv,
     log::{debug, error},
@@ -17,8 +19,9 @@ impl Kurv {
 
             let is_pending_removal = egg.is_pending_removal();
             let is_stopped = egg.is_stopped();
+            let is_restarting = egg.is_restarting();
 
-            if !is_stopped && !is_pending_removal {
+            if !is_stopped && !is_pending_removal && !is_restarting {
                 continue;
             }
 
@@ -35,28 +38,28 @@ impl Kurv {
                 // check if the egg is actually running when it shouldn't
                 match child.inner().try_wait() {
                     Ok(None) => {
-                        // it's still running, let's kill the mf
-                        // kill errors when there's nothing to kill, in this case,
-                        // we can ignore the error.
-                        let _ = child.kill();
-
-                        // TODO: we can't ingore it actually xD
-                        // match child.kill() {
-                        //     Ok(_) => Ok(()),
-                        //     Err(ref e) if e.kind() == std::io::ErrorKind::InvalidData => {
-                        //         // Process already exited
-                        //         info!("Task {task_id} has already finished by itself.");
-                        //         Ok(())
-                        //     }
-                        //     Err(err) => Err(err),
-                        // }
+                        // it's still running, let's kill the mf    
+                        match child.kill() {
+                            Err(ref e) if e.kind() == std::io::ErrorKind::InvalidData => {
+                                warn!("egg {} has already finished by itself.", egg.name);
+                            }
+                            Err(err) => {
+                                error!("error while stopping egg {}: {}", egg.name, err);
+                            },
+                            _ => {}
+                        }
 
                         // we should also remove the child from the workers map and
                         // set the egg as stopped (clear its pid, etc, not just the state)
                         self.workers.remove_child(None, egg.name.clone());
-                        egg.set_as_stopped();
-                        unsynced = true;
 
+                        if is_restarting {
+                            egg.reset_state();
+                        } else {
+                            egg.set_as_stopped();
+                        }
+
+                        unsynced = true;
                         debug!("egg <green>{}</green> has been stopped", egg.name);
                     }
                     Ok(_) => {

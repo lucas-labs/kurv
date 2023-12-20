@@ -17,6 +17,7 @@ pub enum StopStartAction {
     Stop,
     Start,
     Remove,
+    Restart,
 }
 
 struct Strings<'a> {
@@ -131,6 +132,11 @@ fn get_strings<'a>(action: StopStartAction) -> Strings<'a> {
             action: "remove",
             doing_action: "removing",
             past_action: "removed",
+        },
+        StopStartAction::Restart => Strings {
+            action: "restart",
+            doing_action: "restarting",
+            past_action: "restarted",
         },
     }
 }

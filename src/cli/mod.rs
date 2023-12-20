@@ -41,6 +41,8 @@ pub fn dispatch_command() -> Result<DispatchResult> {
                     .map(|_| DispatchResult::Dispatched),
                 "remove" => cmd::stop_start::run(&mut arguments, StopStartAction::Remove)
                     .map(|_| DispatchResult::Dispatched),
+                "restart" => cmd::stop_start::run(&mut arguments, StopStartAction::Restart)
+                    .map(|_| DispatchResult::Dispatched),
                 "collect" => cmd::collect::run(&mut arguments).map(|_| DispatchResult::Dispatched),
                 _ => cmd::default::run(
                     &mut arguments,

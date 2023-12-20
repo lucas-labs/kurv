@@ -37,6 +37,7 @@ impl Router {
             ("GET", "/eggs/(?P<egg_id>[0-9]+)", eggs::get),
             ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/stop", eggs::stop),
             ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/start", eggs::start),
+            ("POST", "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/restart", eggs::restart),
             (
                 "POST",
                 "/eggs/(?P<egg_id>[0-9a-zA-Z]+)/remove",

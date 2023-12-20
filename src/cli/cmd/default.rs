@@ -49,6 +49,7 @@ fn help(err: Option<&str>) {
                 ("list", vec!["l"], "prints eggs list and their statuses"),
                 ("stop", vec![], "stops a running egg"),
                 ("start", vec![], "starts a stopped egg"),
+                ("restart", vec![], "restarts a running egg"),
                 ("remove", vec![], "removes an egg"),
                 ("collect", vec![], "collects and starts a new egg"),
             ]),

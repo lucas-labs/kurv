@@ -14,6 +14,7 @@ pub enum EggStatus {
     Running,
     Stopped,
     PendingRemoval,
+    Restarting,
     Errored,
 }
 
@@ -236,6 +237,15 @@ impl Egg {
         self.set_start_time(None);
     }
 
+    /// resets the `egg` to its initial state
+    pub fn reset_state(&mut self) {
+        self.set_status(EggStatus::Pending);
+        self.set_error("".to_string());
+        self.set_pid(0);
+        self.set_start_time(None);
+    }
+    
+
     /// checks if the `egg` should be spawned
     /// (if its state is `Pending` or `Errored`).
     ///
@@ -266,28 +276,31 @@ impl Egg {
     /// checks if the `egg` is running
     /// (if its state is `Running`).
     pub fn is_running(&self) -> bool {
-        if let Some(ref egg_state) = self.state {
-            egg_state.status == EggStatus::Running
-        } else {
-            false
-        }
+        self.is_in_status(EggStatus::Running)
     }
 
     /// checks if the `egg` is stopped
     /// (if its state is `Stopped`).
     pub fn is_stopped(&self) -> bool {
-        if let Some(ref egg_state) = self.state {
-            egg_state.status == EggStatus::Stopped
-        } else {
-            false
-        }
+        self.is_in_status(EggStatus::Stopped)
     }
 
     /// checks if the `egg` is pending removal
     /// (if its state is `PendingRemoval`).
     pub fn is_pending_removal(&self) -> bool {
+        self.is_in_status(EggStatus::PendingRemoval)
+    }
+
+    /// checks if the `egg` is restarting
+    /// (if its state is `Restarting`).
+    pub fn is_restarting(&self) -> bool {
+        self.is_in_status(EggStatus::Restarting)
+    }
+
+    /// checks if the `egg` is in the given `status`.
+    pub fn is_in_status(&self, status: EggStatus) -> bool {
         if let Some(ref egg_state) = self.state {
-            egg_state.status == EggStatus::PendingRemoval
+            egg_state.status == status
         } else {
             false
         }

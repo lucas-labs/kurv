@@ -88,19 +88,24 @@ pub fn get(request: &Request, ctx: &Context) -> Result<Response> {
     Ok(err(400, WRONG_ID_MSG.to_string()))
 }
 
-/// tries to stop a running egg
+/// stop a running egg
 pub fn stop(request: &Request, ctx: &Context) -> Result<Response> {
     set_status(request, ctx, EggStatus::Stopped)
 }
 
-/// tries to stop a running egg
+/// start a running egg
 pub fn start(request: &Request, ctx: &Context) -> Result<Response> {
     set_status(request, ctx, EggStatus::Pending)
 }
 
-/// tries to remove an egg
+/// remove an egg
 pub fn remove(request: &Request, ctx: &Context) -> Result<Response> {
     set_status(request, ctx, EggStatus::PendingRemoval)
+}
+
+/// restart a running egg
+pub fn restart(request: &Request, ctx: &Context) -> Result<Response> {
+    set_status(request, ctx, EggStatus::Restarting)
 }
 
 /// changes the status of an egg to Stopped or Pending
@@ -128,6 +133,7 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
                     }
                     EggStatus::Stopped => {}
                     EggStatus::PendingRemoval => {}
+                    EggStatus::Restarting => {}
                     _ => {
                         let trim: &[_] = &['\r', '\n'];
                         return Ok(err(
