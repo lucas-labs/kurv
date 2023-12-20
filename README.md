@@ -144,3 +144,9 @@ Derived from [eggsecutor](https://github.com/lucas-labs/kurv), ${\normalsize \te
 
 ### pueue
 Insights from [pueue](https://github.com/Nukesor/pueue) were instrumental in helping me understand how to manage processes in Rust.
+
+
+<br><br>
+
+-------
+With 🧉 from Argentina 🇦🇷
