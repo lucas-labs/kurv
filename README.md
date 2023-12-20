@@ -27,7 +27,7 @@
 
 Download the latest release from GitHub. 
 
-> [!INFO] 
+> [!NOTE] 
 > `kurv` can run either as a server or as a CLI client, using the same binary. 
 
 ## Start the server
