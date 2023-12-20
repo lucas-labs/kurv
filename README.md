@@ -4,7 +4,6 @@
 <br>
 <br>
 
-
 <p align="center">${\normalsize \textbf{kurv}}$ is a process manager, mainly for Node.js and Python applications. It's written in <code>Rust</code>. It daemonizes your apps so that they can run in the background. It also restarts them if they crash.</p>
 
 <br>
@@ -33,6 +32,10 @@ Download the latest release from GitHub.
 > ${\normalsize \textbf{kurv}}$ can run either as a server or as a CLI client, using the same binary. 
 >
 > The server is responsible for managing the eggs, while the client is used to interact with the server and tell it what to do or ask it for information.
+
+
+![kurv usage](.github/kurv.gif)
+
 
 ## Start the server
 

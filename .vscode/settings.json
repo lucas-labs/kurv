@@ -3,7 +3,7 @@
         // 😺 git
         ".git": true,
         ".gitignore": true,
-        ".github": true,
+        // ".github": true,
         
         // 📦 packages
         "Cargo.lock": true,
