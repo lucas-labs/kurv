@@ -22,7 +22,8 @@ impl KurvState {
     /// path, or creates a new one if it doesn't exist
     pub fn load(path: PathBuf) -> Result<KurvState> {
         if !path.exists() {
-            debug!(".kurv file not found, starting fresh");
+            debug!(".kurv file not found, starting fresh (searched in {})", path.display());
+            debug!("you can set KURV_HOME to change the directory");
             return Ok(KurvState {
                 eggs: BTreeMap::new(),
             });
