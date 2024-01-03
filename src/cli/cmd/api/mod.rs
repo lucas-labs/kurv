@@ -106,7 +106,7 @@ pub fn parse_response<'a, T: Deserialize<'a>>(
     let maybe_egg: Result<T, _> = serde_json::from_str(response.body.as_str());
 
     match maybe_egg {
-        Ok(parsed) => return Ok(ParsedResponse::Success(parsed)),
+        Ok(parsed) => Ok(ParsedResponse::Success(parsed)),
         Err(_) => {
             // try to parse it as an ErrorResponse.
             let maybe_err_resp: Result<ErrorResponse, _> =

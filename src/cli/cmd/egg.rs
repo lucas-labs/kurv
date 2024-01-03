@@ -27,57 +27,50 @@ pub fn run(args: &mut Arguments) -> Result<()> {
     let cmd_arg: Result<Option<String>> =
         args.opt_free_from_str().map_err(|_| anyhow!("wrong usage"));
 
-    match cmd_arg {
-        Ok(maybe_arg) => match maybe_arg {
-            Some(id) => {
-                if is_option_or_flag(&id) {
-                    return Err(anyhow!("wrong usage"));
+    if let Ok(Some(id)) = cmd_arg {
+        if is_option_or_flag(&id) {
+            return Err(anyhow!("wrong usage"));
+        }
+
+        let response = api.egg(id.as_str());
+
+        if let Ok(egg) = response {
+            let args = match egg.args.clone() {
+                Some(args) => args.join(" "),
+                None => "".to_string(),
+            };
+
+            printth!(
+                "{}",
+                formatdoc! {
+                    "
+
+                    <b><white>🥚 »</white> <white>{}</white></b>
+                    
+                    <magenta><b>id      </b></magenta>{}
+                    <magenta><b>name    </b></magenta>{}
+                    <magenta><b>command </b></magenta>{}
+                    <magenta><b>cwd     </b></magenta>{}
+                    ",
+                    egg.name,
+                    egg.id.unwrap(),
+                    egg.name,
+                    egg.command.clone() + " <dim>" + args.as_str() + "</dim>",
+                    egg.cwd.clone().unwrap_or(PathBuf::from(".")).display(),
                 }
+            );
 
-                let response = api.egg(id.as_str());
-
-                match response {
-                    Ok(egg) => {
-                        let args = match egg.args.clone() {
-                            Some(args) => args.join(" "),
-                            None => "".to_string(),
-                        };
-
-                        printth!(
-                            "{}",
-                            formatdoc! {
-                                "
-
-                                <b><white>🥚 »</white> <white>{}</white></b>
-                                
-                                <magenta><b>id      </b></magenta>{}
-                                <magenta><b>name    </b></magenta>{}
-                                <magenta><b>command </b></magenta>{}
-                                <magenta><b>cwd     </b></magenta>{}
-                                ",
-                                egg.name,
-                                egg.id.unwrap(),
-                                egg.name,
-                                egg.command.clone() + " <dim>" + args.as_str() + "</dim>",
-                                egg.cwd.clone().unwrap_or(PathBuf::from(".")).display(),
-                            }
-                        );
-
-                        print_env(&egg);
-                        println!("");
-                        print_paths(&egg);
-                        println!("");
-                        print_state(&egg);
-                    }
-                    _ => {}
-                }
-
-                Ok(())
-            }
-            None => help(),
-        },
-        Err(e) => Err(e),
+            print_env(&egg);
+            println!();
+            print_paths(&egg);
+            println!();
+            print_state(&egg);
+        }
+    } else {
+        help()?;
     }
+
+    Ok(())
 }
 
 fn print_state(egg: &Egg) {

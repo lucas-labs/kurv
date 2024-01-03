@@ -108,7 +108,7 @@ pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
     // Read the request line
     let mut request_line = String::new();
     buf_reader.read_line(&mut request_line).unwrap();
-    let parts: Vec<&str> = request_line.trim().split_whitespace().collect();
+    let parts: Vec<&str> = request_line.split_whitespace().collect();
     let method = parts[0].to_string();
     let full_path = parts[1].to_string();
 

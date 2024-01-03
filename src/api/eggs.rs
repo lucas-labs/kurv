@@ -45,7 +45,7 @@ pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
             },
             name: egg.name.clone(),
             status: match egg.state {
-                Some(ref state) => state.status.clone(),
+                Some(ref state) => state.status,
                 None => EggStatus::Pending,
             },
             uptime: match egg.state {
@@ -124,16 +124,13 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
                 match status {
                     EggStatus::Pending => {
                         // we can only change to pending if its state is currently Stopped
-                        match egg.state.clone() {
-                            Some(state) => {
-                                if state.status != EggStatus::Stopped {
-                                    return Ok(err(
-                                        400,
-                                        format!("egg {} is already running", egg.name),
-                                    ));
-                                }
+                        if let Some(state) = egg.state.clone() {
+                            if state.status != EggStatus::Stopped {
+                                return Ok(err(
+                                    400,
+                                    format!("egg {} is already running", egg.name),
+                                ));
                             }
-                            _ => {}
                         }
                     }
                     EggStatus::Stopped => {}

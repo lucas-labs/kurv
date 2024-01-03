@@ -16,7 +16,7 @@ impl Kurv {
         for (key, egg) in eggs.iter_mut() {
             // if the egg is errored or pending, try to spawn it
             if egg.should_spawn() {
-                let (updated_egg, child) = self.spawn_egg(&egg);
+                let (updated_egg, child) = self.spawn_egg(egg);
 
                 // update original egg in state.eggs with the new values
                 state.eggs.insert(key.clone(), updated_egg);
@@ -70,7 +70,7 @@ impl Kurv {
                         // yikes, the egg has exited, let's update its state
                         let exit_err_msg: String = match status.code() {
                             Some(code) => format!("Exited with code {}", code),
-                            None => format!("Exited with unknown code"),
+                            None => "Exited with unknown code".to_string(),
                         };
 
                         // try to get the try count from the egg
@@ -136,7 +136,7 @@ impl Kurv {
             .stdout(stdout_log)
             .stderr(stderr_log)
             .args(args.unwrap_or_else(Vec::new))
-            .envs(envs.unwrap_or_else(|| std::collections::HashMap::new()))
+            .envs(envs.unwrap_or_else(std::collections::HashMap::new))
             .group_spawn();
 
         // check if it has been spawned correctly

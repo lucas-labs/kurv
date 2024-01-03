@@ -86,7 +86,7 @@ where
         let words = words.iter().map(|s| s.as_ref()).collect::<Vec<&str>>();
         words.iter().map(|s| c.mutate(s)).collect()
     } else {
-        words.join(&delim)
+        words.join(delim)
     }
 }
 

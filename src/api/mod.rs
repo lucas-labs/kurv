@@ -7,7 +7,6 @@ use {
     crate::kurv::{InfoMtx, KurvStateMtx},
     anyhow::Result,
     log::info,
-    regex_lite,
     std::net::TcpListener,
 };
 
@@ -68,28 +67,19 @@ impl Handler for Router {
         for (route_re, handler) in compiled_routes {
             let route = format!("{method} {path}");
             let route_str = route.as_str();
-            let names = route_re.capture_names();
+            let names = route_re.capture_names().flatten();
 
             if let Some(capture) = route_re.captures(route_str) {
                 for key in names {
-                    if let Some(key) = key {
-                        let value = capture.name(key);
-                        let value = match value {
-                            Some(value) => value.as_str(),
-                            None => "",
-                        };
-
-                        request
-                            .path_params
-                            .insert(key.to_string(), value.to_string());
-                    }
+                    let value = capture.name(key).map(|v| v.as_str()).unwrap_or("");
+                    request.path_params.insert(key.to_string(), value.to_string());
                 }
 
                 let ctx = Context {
                     state: self.state.clone(),
                     info: self.info.clone(),
                 };
-                result = match handler(&request, &ctx) {
+                result = match handler(request, &ctx) {
                     Ok(response) => response,
                     Err(e) => err(500, format!("{}", e)),
                 };

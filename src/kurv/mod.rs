@@ -84,7 +84,7 @@ impl Kurv {
     ///
     /// this should only be called on bootstrap, as it will expect all
     /// eggs to not be running
-    pub fn collect() -> Result<(Arc<Mutex<Info>>, Arc<Mutex<KurvState>>)> {
+    pub fn collect() -> Result<(InfoMtx, KurvStateMtx)> {
         let info = Info::new();
         let mut state = KurvState::load(info.paths.kurv_file.clone()).unwrap();
 

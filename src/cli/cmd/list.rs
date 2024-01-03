@@ -28,7 +28,7 @@ pub fn run(args: &mut Arguments) -> Result<()> {
     let api = Api::new();
     let eggs_summary_list = api.eggs_summary()?;
 
-    if eggs_summary_list.0.len() == 0 {
+    if eggs_summary_list.0.is_empty() {
         printth!(indoc! {
             "\nthere are no 🥚 in the kurv <warn>=(</warn>
                 
@@ -88,7 +88,7 @@ pub fn run(args: &mut Arguments) -> Result<()> {
         .separator(separator.build());
 
     print_stdout(table)?;
-    println!("");
+    println!();
 
     Ok(())
 }

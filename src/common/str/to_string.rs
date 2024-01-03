@@ -9,7 +9,7 @@ where
 
         // if we couldn't serialize to string with serde
         // we return te struct name
-        Err(_) => format!("{}", std::any::type_name::<T>()),
+        Err(_) => std::any::type_name::<T>().to_string(),
     }
 }
 

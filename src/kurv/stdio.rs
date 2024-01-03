@@ -16,7 +16,7 @@ enum StdioFile {
 /// Create and return the two file handles for the `(stdout, stderr)` log file of a task.
 /// These are two handles to the same file.
 pub fn create_log_file_handles(
-    task_name: &String,
+    task_name: &str,
     path: &Path,
 ) -> Result<((PathBuf, File), (PathBuf, File))> {
     // create path if it doesn't exist
@@ -39,7 +39,7 @@ fn create_or_append_file(path: &Path) -> Result<File> {
 }
 
 /// Get the path to the log file of a task.
-pub fn get_log_paths(task_name: &String, path: &Path) -> (PathBuf, PathBuf) {
+pub fn get_log_paths(task_name: &str, path: &Path) -> (PathBuf, PathBuf) {
     let task_log_dir = path.join("task_logs");
 
     (
@@ -49,9 +49,9 @@ pub fn get_log_paths(task_name: &String, path: &Path) -> (PathBuf, PathBuf) {
 }
 
 /// Get the filename of the log file of a task.
-fn stdio_filename(task_name: &String, file_type: StdioFile) -> String {
+fn stdio_filename(task_name: &str, file_type: StdioFile) -> String {
     // make task_name kebab-case
-    task_name.clone()
+    task_name.to_owned().clone()
         + match file_type {
             StdioFile::Stdout => ".stdout",
             StdioFile::Stderr => ".stderr",

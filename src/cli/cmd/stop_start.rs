@@ -58,25 +58,22 @@ pub fn run(args: &mut Arguments, action: StopStartAction) -> Result<()> {
                 );
 
                 let response = api.eggs_post(
-                    format!("/{}/{}", id, strings.action.to_string()).as_str(),
+                    format!("/{}/{}", id, strings.action).as_str(),
                     "",
                 );
 
-                match response {
-                    Ok(egg) => {
-                        printth!(
-                            indoc! {
-                                "egg <green>{}</green> has been scheduled to be {}
-                                 
-                                <head><b>i</b></head> you can check its status by running:
-                                  <dim>$</dim> <white><b>kurv</b></white> egg <green>1</green>
-                                "
-                            },
-                            strings.past_action,
-                            egg.name
-                        );
-                    }
-                    _ => {}
+                if let Ok(egg) = response {
+                    printth!(
+                        indoc! {
+                            "egg <green>{}</green> has been scheduled to be {}
+                             
+                            <head><b>i</b></head> you can check its status by running:
+                              <dim>$</dim> <white><b>kurv</b></white> egg <green>1</green>
+                            "
+                        },
+                        strings.past_action,
+                        egg.name
+                    );
                 }
 
                 Ok(())

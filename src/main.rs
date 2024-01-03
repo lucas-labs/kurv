@@ -22,7 +22,9 @@ use {
 fn main() -> Result<()> {
     Logger::init(Level::Trace)?;
 
-    let result = match dispatch_command()? {
+    
+
+    match dispatch_command()? {
         DispatchResult::Dispatched => Ok(()),
         DispatchResult::Server => {
             if !can_run_as_server() {
@@ -44,9 +46,7 @@ fn main() -> Result<()> {
             Kurv::new(info.clone(), state.clone()).run();
             Ok(())
         }
-    };
-
-    result
+    }
 }
 
 /// check if the app can run as a server

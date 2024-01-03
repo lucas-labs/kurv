@@ -1,4 +1,5 @@
 use super::{Component, Logo};
+use std::fmt::Write;
 
 static SUMMARY: &str = "{summary}";
 static OPTIONS_HEAD: &str = "<head>options</head>";
@@ -40,7 +41,7 @@ impl<'a> Component for Help<'a> {
 
         usage.push_str(" <dim>[args...]</dim>");
 
-        help.push_str(&usage.replace("{command}", &self.command));
+        help.push_str(&usage.replace("{command}", self.command));
 
         if let Some(summary) = &self.summary {
             help.push_str(&format!("\n\n{}", SUMMARY.replace("{summary}", summary)));
@@ -58,7 +59,7 @@ impl<'a> Component for Help<'a> {
             help.push_str(&self.render_items(subcommands, "|"));
         }
 
-        help.push_str("\n");
+        help.push('\n');
 
         help
     }
@@ -74,21 +75,24 @@ impl<'a> Help<'a> {
             .unwrap_or(0)
             + 4;
 
-        items
-            .iter()
-            .map(|(item, aliases, description)| {
-                let item = match aliases.len() {
-                    0 => item.to_string(),
-                    _ => format!("{}{separator}{}", item, aliases.join(separator)),
-                };
+        let mut result = String::new();
 
-                format!(
-                    "\n  <highlight>{:<width$}</highlight>{}",
-                    item,
-                    description,
-                    width = gutter_space
-                )
-            })
-            .collect()
+        for (item, aliases, description) in items {
+            let item = match aliases.len() {
+                0 => item.to_string(),
+                _ => format!("{}{separator}{}", item, aliases.join(separator)),
+            };
+
+            write!(
+                &mut result,
+                "\n  <highlight>{:<width$}</highlight>{}",
+                item,
+                description,
+                width = gutter_space
+            )
+            .unwrap();
+        }
+
+        result
     }
 }

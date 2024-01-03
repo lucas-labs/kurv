@@ -89,10 +89,10 @@ pub fn parse(string: &str) -> Vec<ParsedNode> {
     let string = &format!("<{}>{}</{}>", WRAPPER_ELEMENT, string, WRAPPER_ELEMENT);
 
     let mut nodes = vec![];
-    let mut tokens = Tokenizer::from(&string[..]);
+    let tokens = Tokenizer::from(&string[..]);
     let mut stack = vec![];
 
-    while let Some(token) = tokens.next() {
+    for token in tokens {
         let token = match token {
             Ok(token) => token,
             Err(_) => continue,
@@ -102,15 +102,13 @@ pub fn parse(string: &str) -> Vec<ParsedNode> {
             Token::ElementStart { prefix, local, .. } => {
                 stack.push((prefix, local, vec![]));
             }
-            Token::ElementEnd { end, .. } => {
-                if let htmlparser::ElementEnd::Close(_, local) = end {
-                    let (_, _, content) = stack.pop().unwrap();
-                    let parsed_node = ParsedNode::Tag(local.to_string(), content);
-                    if let Some(top) = stack.last_mut() {
-                        top.2.push(parsed_node);
-                    } else {
-                        nodes.push(parsed_node);
-                    }
+            Token::ElementEnd { end: htmlparser::ElementEnd::Close(_, local), .. } => {
+                let (_, _, content) = stack.pop().unwrap();
+                let parsed_node = ParsedNode::Tag(local.to_string(), content);
+                if let Some(top) = stack.last_mut() {
+                    top.2.push(parsed_node);
+                } else {
+                    nodes.push(parsed_node);
                 }
             }
             Token::Text { text } => {
@@ -127,11 +125,11 @@ pub fn parse(string: &str) -> Vec<ParsedNode> {
     // filter out the wrapper element
     nodes
         .into_iter()
-        .flat_map(|node| match &node {
+        .flat_map(|node| match node {
             ParsedNode::Tag(tag, content) if tag == WRAPPER_ELEMENT => {
-                content.iter().cloned().collect::<Vec<_>>().into_iter()
+                content.clone()
             }
-            _ => vec![node.clone()].into_iter(),
+            _ => vec![node],
         })
         .collect::<Vec<_>>()
 }
@@ -150,9 +148,9 @@ pub fn initialize_theme() {
 macro_rules! printth {
     // This pattern captures the arguments passed to the macro.
     ($($arg:tt)*) => {
-        crate::cli::color::theme::initialize_theme();
+        $crate::cli::color::theme::initialize_theme();
         unsafe {
-            if let Some(theme) = &crate::cli::color::theme::GLOBAL_THEME {
+            if let Some(theme) = &$crate::cli::color::theme::GLOBAL_THEME {
                 let formatted_string = format!($($arg)*);
                 let themed_string = theme.apply(&formatted_string);
                 println!("{}", themed_string);

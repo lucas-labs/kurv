@@ -9,9 +9,7 @@ impl KurvState {
     pub fn collect(&mut self, egg: &Egg) -> usize {
         // from self.eggs find the one with the highest egg.id
         let next_id = self
-            .eggs
-            .iter()
-            .map(|(_, egg)| egg.id.unwrap_or(0))
+            .eggs.values().map(|egg| egg.id.unwrap_or(0))
             .max()
             .unwrap_or(0)
             + 1;
@@ -25,24 +23,12 @@ impl KurvState {
 
     /// 🥚 » retrieves the egg with the given `id` from the state
     pub fn get(&self, id: usize) -> Option<&Egg> {
-        for (_, e) in self.eggs.iter() {
-            if e.id == Some(id) {
-                return Some(e);
-            }
-        }
-
-        None
+        self.eggs.values().find(|&e| e.id == Some(id))
     }
 
     /// 🥚 » retrieves the egg with the given `id` from the state as a mutable reference
     pub fn get_mut(&mut self, id: usize) -> Option<&mut Egg> {
-        for (_, e) in self.eggs.iter_mut() {
-            if e.id == Some(id) {
-                return Some(e);
-            }
-        }
-
-        None
+        self.eggs.iter_mut().map(|(_, e)| e).find(|e| e.id == Some(id))
     }
 
     /// 🥚 » retrieves the egg with the given `name` from the state
@@ -52,13 +38,7 @@ impl KurvState {
 
     /// 🥚 » retrieves the egg with the given `pid` from the state
     pub fn get_by_pid(&self, pid: u32) -> Option<&Egg> {
-        for (_, e) in self.eggs.iter() {
-            if e.state.is_some() && e.state.as_ref().unwrap().pid == pid {
-                return Some(e);
-            }
-        }
-
-        None
+        self.eggs.values().find(|&e| e.state.is_some() && e.state.as_ref().unwrap().pid == pid)
     }
 
     // 🥚 » returns `true` if there's an agg with name `key`
@@ -86,7 +66,7 @@ impl KurvState {
         }
 
         // Check if the token corresponds to an egg name and return its id
-        if let Some(egg) = self.get_by_name(&token) {
+        if let Some(egg) = self.get_by_name(token) {
             return egg.id;
         }
 

@@ -43,24 +43,21 @@ pub fn run(args: &mut Arguments) -> Result<()> {
                         let response = api.eggs_post("", body.as_ref());
 
                         // check response
-                        match response {
-                            Ok(egg) => {
-                                printth!(
-                                    "{}",
-                                    formatdoc! {
-                                        "egg <green>{}</green> has been collected with id {} and
-                                        scheduled to be started
-                                            
-                                        <head><b>i</b></head> you can check its status by running:
-                                            <dim>$</dim> <white><b>kurv</b></white> egg <green>{}</green>
-                                        ",
-                                        egg.name,
-                                        egg.id.unwrap_or(0),
-                                        egg.id.unwrap_or(0),
-                                    }
-                                );
-                            }
-                            _ => {}
+                        if let Ok(egg) = response {
+                            printth!(
+                                "{}",
+                                formatdoc! {
+                                    "egg <green>{}</green> has been collected with id {} and
+                                    scheduled to be started
+                                        
+                                    <head><b>i</b></head> you can check its status by running:
+                                        <dim>$</dim> <white><b>kurv</b></white> egg <green>{}</green>
+                                    ",
+                                    egg.name,
+                                    egg.id.unwrap_or(0),
+                                    egg.id.unwrap_or(0),
+                                }
+                            );
                         }
                     }
                     Err(_) => exit(1),
@@ -89,7 +86,6 @@ fn help() -> Result<()> {
                   
                   <dim>$</dim> <white><b>kurv</b></white> collect <green>./egg.kurv</green>",
                 }
-                .as_ref()
             ),
             error: None,
             options: Some(vec![("-h, --help", vec![], "Prints this help message"),]),
