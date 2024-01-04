@@ -1,0 +1,28 @@
+# action.yaml
+name: "poetry project configuration"
+description: "get information about poetry project: version, name, description, etc."
+branding:
+  icon: 'aperture'
+  color: 'green'
+inputs:
+  cargo-toml-path:
+    description: "location of cargo toml file"
+    required: true
+    default: "./cargo.toml"
+outputs:
+  is-local-higher:
+    description: "True if local version is higher than public version"
+  local-version:
+    description: "Local version of the package"
+  published-version:
+    description: "Public version of the package"
+  package-name:
+    description: "Name of the package"
+  package-description:
+    description: "Description of the package"
+  
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.cargo-toml-path }}

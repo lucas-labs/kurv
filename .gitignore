@@ -31,3 +31,6 @@ task_logs/
 !.vscode/launch.json
 !.vscode/extensions.json
 .logs/
+
+### CI ###
+.github/act-test

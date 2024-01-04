@@ -1,0 +1,61 @@
+name: "🔖 » generate draft release"
+on:
+  workflow_call:
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: 'bash'
+
+jobs:
+  release:
+    name: "🔖 » draft release"
+    runs-on: ubuntu-latest
+    outputs:
+      release-note: ${{ steps.changelog.outputs.changelog }}
+      version: ${{ steps.version.outputs.local-version }}
+
+    steps:
+      - name: 📁 » checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: ⬅️ » get previous git tag
+        id: tag
+        run: echo "last-tag=$(git describe --tags --abbrev=0 || git rev-list --max-parents=0 ${{github.ref}})" >> $GITHUB_OUTPUT
+      
+      - name: 🏷️ » get versions
+        uses: ./.github/actions/check-version
+        id: version
+        with:
+          cargo-toml-path: "./Cargo.toml"
+
+      - name: 📑 » generate changelog
+        uses: lucaslabstech/action-release@v1.0.4
+        id: changelog
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          from: ${{ steps.tag.outputs.last-tag }}
+          to: ${{ github.ref }}
+          next-version: v${{ steps.version.outputs.local-version }}
+          
+      - name: 🗑️ » delete outdated drafts
+        uses: hugo19941994/delete-draft-releases@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔖 » create draft release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          prerelease: false
+          draft: true
+          tag_name: v${{ steps.version.outputs.local-version }}
+          name: v${{ steps.version.outputs.local-version }}
+          body: ${{ steps.changelog.outputs.changelog }}

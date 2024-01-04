@@ -4,7 +4,31 @@ version: '3'
 
 tasks:
   build:release:
-    desc: ⚡ build kurv (release)
+    desc: ⚡ build kurv «release»
     cmds:
       - cargo build --release
       - python check_size.py
+
+  # the following tasks are for testing the ci workflow locally, using the
+  # nektosact.com tool
+
+  local-ci-release:
+    desc: 🚀 run local ci workflow «release»
+    cmds:
+      - |
+        act push \
+          -W="./.github/workflows/ci.yml" \
+          -e="./.github/act-test/release.json" \
+          --secret-file="./.github/act-test/secrets.env" \
+          --pull=false
+
+  local-ci-pub:
+    desc: 🚀 run local ci workflow «publish»
+    cmds:
+      - |
+        act release \
+          -W="./.github/workflows/publish.yml" \
+          -e="./.github/act-test/publish.json" \
+          --secret-file="./.github/act-test/secrets.env" \
+          --pull=false \
+          --reuse

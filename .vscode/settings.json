@@ -2,7 +2,7 @@
     "files.exclude": {
         // 😺 git
         ".git": true,
-        ".gitignore": true,
+        // ".gitignore": true,
         // ".github": true,
         
         // 📦 packages
