@@ -1,12 +1,12 @@
 name: "🚀 » publish"
+
 on:
   release:
     types: [published]
 
-env:
-  CRATE_NAME: kurv
-  GITHUB_TOKEN: ${{ github.token }}
-  RUST_BACKTRACE: 1
+defaults:
+  run:
+    shell: 'bash'
 
 jobs:
   build:
@@ -61,4 +61,22 @@ jobs:
         with:
           name: kurv-${{ matrix.platform.os_name }}
           path: "kurv-*"
+
           
+  publish-gh-release:
+    name: 🚀 » publish github release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # downloads the artifact from the build job
+      - name: 📥 » download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: 📁 » list files
+        run: ls -l -a -R
+
+      - name: 🚀 » upload artifacts to github release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            kurv-*
