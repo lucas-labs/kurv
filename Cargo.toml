@@ -2,10 +2,15 @@
 name = "kurv"
 version = "0.0.1"
 edition = "2021"
-description = "A process manager to deamonize commands and programs. Made with 🧉 from Argentina"
-authors = ["Lucas Colombo<lucas@lucode.ar>"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "A process manager to daemonize commands and programs. Inspired by pm2, but lightweight and not as featureful."
+authors = ["Lucas Colombo<lucasncolombo@gmail.com>"]
+license = "MIT"
+license-file = "LICENSE"
+repository = "https://github.com/lucas-labs/kurv"
+categories = ["command-line-utilities"]
+readme = "README.md"
+homepage = "https://kurv.lucode.ar"
+keywords = ["cli", "process", "manager", "daemon", "daemonize"]
 
 [profile.release]
 strip = true
@@ -17,7 +22,6 @@ rpath = false
 overflow-checks = false
 debug = 0
 debug-assertions = false
-# incremental = true # remove this one
 
 [dependencies]
 anyhow = "1.0.75"

@@ -32,15 +32,6 @@ jobs:
             bin: kurv.exe
             archive: kurv-windows-x86_64.zip
     steps:
-      - name: 📜 » log run info
-        run: |
-          echo "os: ${{ matrix.platform.os }}"
-          echo "os_name: ${{ matrix.platform.os_name }}"
-          echo "target: ${{ matrix.platform.target }}"
-          echo "bin: ${{ matrix.platform.bin }}"
-          echo "archive: ${{ matrix.platform.archive }}"
-          echo "run_id: ${{ github.run_id }}"
-
       - name: 📁 » checkout repository
         uses: actions/checkout@v3
         with:
@@ -81,10 +72,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: 📜 » log run info
-        run: |
-          echo "run_id: ${{ github.run_id }}"
-
       - name: 📥 » download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -99,3 +86,21 @@ jobs:
         with:
           files: |
             kurv-*
+
+  publish-crates-io:
+    name: 🚀 » publish crates.io 
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📁 » checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 🦀 » install rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 🚀 » publish
+        uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CRATES_TOKEN }}
