@@ -4,13 +4,13 @@ version = "0.0.1"
 edition = "2021"
 description = "A process manager to daemonize commands and programs. Inspired by pm2, but lightweight and not as featureful."
 authors = ["Lucas Colombo<lucasncolombo@gmail.com>"]
+categories = ["command-line-utilities"]
+keywords = ["cli", "process", "manager", "daemon", "daemonize"]
+homepage = "https://kurv.lucode.ar"
 license = "MIT"
 license-file = "LICENSE"
-repository = "https://github.com/lucas-labs/kurv"
-categories = ["command-line-utilities"]
 readme = "README.md"
-homepage = "https://kurv.lucode.ar"
-keywords = ["cli", "process", "manager", "daemon", "daemonize"]
+repository = "https://github.com/lucas-labs/kurv"
 
 [profile.release]
 strip = true
