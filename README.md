@@ -9,7 +9,7 @@
 
 <p align="center"><img align="center" alt="Crates.io Version" src="https://img.shields.io/crates/v/kurv?style=flat-square&color=%2318181b&link=https%3A%2F%2Fcrates.io%2Fcrates%2Fkurv"></p>
 
-<p align="center"><a href="https://kurv.lucode.ar" target="_blank">Docs</a> • <a href="https://crates.io/crates/kurv">Crate</a></p>
+<p align="center"><a href="https://kurv.lucode.ar" target="_blank">Docs</a> • <a href="https://crates.io/crates/kurv" target="_blank">Crate</a> • <a href="https://github.com/lucas-labs/kurv/tree/master?tab=readme-ov-file#readme" target="_blank">Readme</a></p>
 
 <br>
 <br>
