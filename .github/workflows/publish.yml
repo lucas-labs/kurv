@@ -70,7 +70,7 @@ jobs:
           cd -
 
       - name: 📤 » upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: kurv-${{ matrix.platform.os_name }}
           path: ${{ matrix.platform.archive }}
