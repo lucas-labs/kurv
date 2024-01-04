@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: 'bash'
@@ -28,6 +32,15 @@ jobs:
             bin: kurv.exe
             archive: kurv-windows-x86_64.zip
     steps:
+      - name: 📜 » log run info
+        run: |
+          echo "os: ${{ matrix.platform.os }}"
+          echo "os_name: ${{ matrix.platform.os_name }}"
+          echo "target: ${{ matrix.platform.target }}"
+          echo "bin: ${{ matrix.platform.bin }}"
+          echo "archive: ${{ matrix.platform.archive }}"
+          echo "run_id: ${{ github.run_id }}"
+
       - name: 📁 » checkout repository
         uses: actions/checkout@v3
         with:
@@ -60,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: kurv-${{ matrix.platform.os_name }}
-          path: "kurv-*"
+          path: ${{ matrix.platform.archive }}
 
           
   publish-gh-release:
@@ -68,9 +81,15 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # downloads the artifact from the build job
+      - name: 📜 » log run info
+        run: |
+          echo "run_id: ${{ github.run_id }}"
+
       - name: 📥 » download artifacts
         uses: actions/download-artifact@v4
+        with:
+          pattern: kurv-*
+          merge-multiple: true
 
       - name: 📁 » list files
         run: ls -l -a -R
