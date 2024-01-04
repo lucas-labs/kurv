@@ -22,11 +22,11 @@ jobs:
             bin: kurv
             archive: kurv-linux-x86_64.tar.gz
 
-          # - os_name: windows-x86_64
-          #   os: windows-latest
-          #   target: x86_64-pc-windows-msvc
-          #   bin: kurv.exe
-          #   archive: kurv-windows-x86_64.zip
+          - os_name: windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: kurv.exe
+            archive: kurv-windows-x86_64.zip
     steps:
       - name: 📁 » checkout repository
         uses: actions/checkout@v3
