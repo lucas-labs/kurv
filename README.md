@@ -156,6 +156,30 @@ If you need the process to be restarted, run:
 $ kurv restart <egg:name|id|pid>
 ```
 
+### To do list
+
+kurv is still under development. Here are some of the things I'm planning to add:
+
+- [ ] Simple password protection
+- [ ] Remotely manage eggs
+- [ ] SSL support
+- [ ] Handle cors correctly
+
+And last but not least:
+
+- [ ] Tests (I know, I know... 🤭)
+
+#### Plugins / extensions
+
+Since kurv is a process manager, we can easily extend its functionality by adding 
+plugin eggs (simple eggs managed by kurv itself that provide additional functionality). 
+
+Here are some ideas I have for plugins:
+
+- [ ] Web UI
+- [ ] Log Viewer 
+- [ ] Log Rotation
+
 ### Inspiration
 
 #### pm2
