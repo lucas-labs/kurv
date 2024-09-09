@@ -22,8 +22,6 @@ use {
 fn main() -> Result<()> {
     Logger::init(Level::Trace)?;
 
-    
-
     match dispatch_command()? {
         DispatchResult::Dispatched => Ok(()),
         DispatchResult::Server => {

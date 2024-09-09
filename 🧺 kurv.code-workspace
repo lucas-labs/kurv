@@ -10,6 +10,10 @@
 			"PATH": "${workspaceFolder}/target/debug;${env:PATH}",
 			"KURV_SERVER": "true",
 			"KURV_HOME": "${workspaceFolder}"
+		},
+		"lucodear-icons.files.associations": {
+			"*.task_logs/stdout": "log",
+			"*.task_logs/stderr": "log",
 		}
 	}
 }
