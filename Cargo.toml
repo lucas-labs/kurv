@@ -1,6 +1,6 @@
 [package]
 name = "kurv"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 description = "A process manager to daemonize commands and programs. Inspired by pm2, but lightweight and not as featureful."
 authors = ["Lucas Colombo<lucasncolombo@gmail.com>"]
