@@ -15,7 +15,7 @@ use {
 
 pub fn run(args: &mut Arguments, err: Option<&str>) -> Result<()> {
     if args.contains(["-v", "--version"]) {
-        print_version();
+        print_version(args);
         return Ok(());
     }
 
@@ -59,8 +59,21 @@ fn help(err: Option<&str>) {
     );
 }
 
-fn print_version() {
+fn print_version(args: &mut Arguments) {
     let version = env!("CARGO_PKG_VERSION").to_string();
+
+    if args.contains(["-j", "--json"]) {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&serde_json::json!({
+                "name": "kurv",
+                "version": version
+            }))
+            .unwrap()
+        );
+        return;
+    }
+
     printth!("<dim>kurv@</dim><white>v{version}</white>");
 
     // TODO: in the future we could show local version and remote version
