@@ -35,6 +35,9 @@ pub fn get_theme() -> Theme {
         "blue": [
             StyleItem::Color(Color::DarkBlue),
         ],
+        "yellow": [
+            StyleItem::Color(Color::Yellow),
+        ],
         "error": [
             StyleItem::Color(Color::Red),
             StyleItem::Attr(Attribute::Bold),

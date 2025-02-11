@@ -2,8 +2,8 @@
     "files.exclude": {
         // 😺 git
         ".git": true,
-        // ".gitignore": true,
-        // ".github": true,
+        ".gitignore": true,
+        // ".github": true, 
         
         // 📦 packages
         "Cargo.lock": true,
@@ -13,11 +13,16 @@
         "check_size.py": true,
 
         // 📝 docs
-        // "README.md": true,
+        "README.md": true,
 
         // 🟦 vscode
         ".vscode": true,
         "*.code-workspace": true,
+
+        // 🗑️ trash
+        ".task": true,
     },
-    "python.analysis.typeCheckingMode": "basic"
+    "[rust]": {
+        "editor.formatOnSave": true
+    }
 }

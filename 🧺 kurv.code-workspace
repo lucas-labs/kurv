@@ -14,6 +14,7 @@
 		"lucodear-icons.files.associations": {
 			"*.task_logs/stdout": "log",
 			"*.task_logs/stderr": "log",
-		}
+		},
+		"lucodear-icons.activeIconPack": "rust_ferris_minimal"
 	}
 }

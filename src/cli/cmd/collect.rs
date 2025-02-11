@@ -1,3 +1,5 @@
+use crate::cli::cmd::wants_raw;
+
 use {
     crate::kurv::Egg,
     anyhow::anyhow,
@@ -33,7 +35,7 @@ pub fn run(args: &mut Arguments) -> Result<()> {
                     return Err(anyhow!("wrong usage"));
                 }
 
-                printth!("\n🥚 <dim>collecting new egg</dim>\n");
+                printth!("\n<yellow>⬮</yellow> <dim>collecting new egg</dim>\n");
 
                 match Egg::load(PathBuf::from(path)) {
                     Ok(egg) => {
@@ -44,6 +46,11 @@ pub fn run(args: &mut Arguments) -> Result<()> {
 
                         // check response
                         if let Ok(egg) = response {
+                            if wants_raw(args) {
+                                printth!("{}", serde_json::to_string_pretty(&egg)?);
+                                return Ok(());
+                            }
+
                             printth!(
                                 "{}",
                                 formatdoc! {
@@ -77,16 +84,14 @@ fn help() -> Result<()> {
         "{}",
         Help {
             command: "kurv stop",
-            summary: Some(
-                indoc! {
-                    "collects an egg and schedules it to be started.
+            summary: Some(indoc! {
+                "collects an egg and schedules it to be started.
                 
                 <head><b>example:</b></head>
                   <dim>-> if we want to collect the egg <green>./egg.kurv</green>:</dim>
                   
                   <dim>$</dim> <white><b>kurv</b></white> collect <green>./egg.kurv</green>",
-                }
-            ),
+            }),
             error: None,
             options: Some(vec![("-h, --help", vec![], "Prints this help message"),]),
             subcommands: None

@@ -150,7 +150,8 @@ macro_rules! printth {
     ($($arg:tt)*) => {
         $crate::cli::color::theme::initialize_theme();
         unsafe {
-            if let Some(theme) = &$crate::cli::color::theme::GLOBAL_THEME {
+            let theme_ptr = std::ptr::addr_of!($crate::cli::color::theme::GLOBAL_THEME);
+            if let Some(theme) = (*theme_ptr).as_ref() {
                 let formatted_string = format!($($arg)*);
                 let themed_string = theme.apply(&formatted_string);
                 println!("{}", themed_string);

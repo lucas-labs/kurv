@@ -9,6 +9,12 @@ tasks:
       - cargo build --release
       - python check_size.py
 
+  build:
+    desc: ⚡ build kurv «debug»
+    cmds:
+      - cargo build
+      - python check_size.py
+
   # the following tasks are for testing the ci workflow locally, using the
   # nektosact.com tool
 
