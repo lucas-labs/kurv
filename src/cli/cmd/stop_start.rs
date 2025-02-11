@@ -112,6 +112,7 @@ fn help(strings: Strings) -> Result<()> {
             error: None,
             options: Some(vec![
                 ("-h, --help", vec![], "Prints this help message"),
+                ("-j, --json", vec![], "Prints the response in json format")
             ]),
             subcommands: None
         }

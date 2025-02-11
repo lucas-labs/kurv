@@ -93,7 +93,10 @@ fn help() -> Result<()> {
                   <dim>$</dim> <white><b>kurv</b></white> collect <green>./egg.kurv</green>",
             }),
             error: None,
-            options: Some(vec![("-h, --help", vec![], "Prints this help message"),]),
+            options: Some(vec![
+                ("-h, --help", vec![], "Prints this help message"),
+                ("-j, --json", vec![], "Prints the response in json format")
+            ]),
             subcommands: None
         }
         .render()
