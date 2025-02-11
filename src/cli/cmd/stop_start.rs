@@ -1,6 +1,8 @@
 use anyhow::anyhow;
 use indoc::formatdoc;
 
+use crate::cli::cmd::wants_raw;
+
 use {
     crate::cli::{
         cmd::{api::Api, is_option_or_flag, wants_help},
@@ -28,7 +30,7 @@ struct Strings<'a> {
 
 /// stops a runnig egg
 ///
-/// IDEA: it works asynchronously, this means that ehen the command
+/// IDEA: it works asynchronously, this means that wehen the command
 /// ends, the egg might still be running. We could implement a --timeout X
 /// option that will check the actual status of the egg until it IS actually
 /// Stopped (has no pid), or reaches timeouts (in which case it should end
@@ -51,18 +53,24 @@ pub fn run(args: &mut Arguments, action: StopStartAction) -> Result<()> {
                     return Err(anyhow!("wrong usage"));
                 }
 
-                printth!(
-                    "\n<white>🥚</white> <dim>{} egg {}</dim>\n",
-                    strings.doing_action,
-                    id
-                );
+                let json_resp = wants_raw(args);
 
-                let response = api.eggs_post(
-                    format!("/{}/{}", id, strings.action).as_str(),
-                    "",
-                );
+                if !json_resp {
+                    printth!(
+                        "\n<yellow>⬮</yellow> <dim>{} egg {}</dim>\n",
+                        strings.doing_action,
+                        id
+                    );
+                }
+
+                let response = api.eggs_post(format!("/{}/{}", id, strings.action).as_str(), "");
 
                 if let Ok(egg) = response {
+                    if json_resp {
+                        printth!("{}", serde_json::to_string_pretty(&egg)?);
+                        return Ok(());
+                    }
+
                     printth!(
                         indoc! {
                             "egg <green>{}</green> has been scheduled to be {}
@@ -71,8 +79,8 @@ pub fn run(args: &mut Arguments, action: StopStartAction) -> Result<()> {
                               <dim>$</dim> <white><b>kurv</b></white> egg <green>1</green>
                             "
                         },
-                        strings.past_action,
-                        egg.name
+                        egg.name,
+                        strings.past_action
                     );
                 }
 

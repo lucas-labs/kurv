@@ -13,6 +13,11 @@ pub fn wants_help(args: &mut Arguments) -> bool {
     args.contains(["-h", "--help"])
 }
 
+/// Returns true if the user wants raw json output
+pub fn wants_raw(args: &mut Arguments) -> bool {
+    args.contains(["-j", "--json"])
+}
+
 /// checks if an argument is not an option or a flag (starts with - or --)
 pub fn is_option_or_flag(arg: &str) -> bool {
     arg.starts_with('-')

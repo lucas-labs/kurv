@@ -1,18 +1,15 @@
 use {
-    crate::cli::{
-        cmd::{api::Api, wants_help},
-        components::{Component, Help},
-    },
-    crate::common::str::ToString,
-    crate::printth,
     crate::{
-        cli::cmd::is_option_or_flag,
+        cli::{
+            cmd::{api::Api, is_option_or_flag, wants_help, wants_raw},
+            components::{Component, Help},
+        },
+        common::str::ToString,
         kurv::{Egg, EggStatus},
+        printth,
     },
-    anyhow::anyhow,
-    anyhow::Result,
-    indoc::formatdoc,
-    indoc::indoc,
+    anyhow::{anyhow, Result},
+    indoc::{formatdoc, indoc},
     pico_args::Arguments,
     std::path::PathBuf,
 };
@@ -35,6 +32,11 @@ pub fn run(args: &mut Arguments) -> Result<()> {
         let response = api.egg(id.as_str());
 
         if let Ok(egg) = response {
+            if wants_raw(args) {
+                printth!("{}", serde_json::to_string_pretty(&egg)?);
+                return Ok(());
+            }
+
             let args = match egg.args.clone() {
                 Some(args) => args.join(" "),
                 None => "".to_string(),
@@ -45,7 +47,7 @@ pub fn run(args: &mut Arguments) -> Result<()> {
                 formatdoc! {
                     "
 
-                    <b><white>🥚 »</white> <white>{}</white></b>
+                    <yellow>⬮</yellow> » <b><white>{}</white></b>
                     
                     <magenta><b>id      </b></magenta>{}
                     <magenta><b>name    </b></magenta>{}

@@ -1,11 +1,13 @@
 use {
-    crate::cli::{
-        cmd::{api::Api, wants_help},
-        components::{Component, Help},
+    crate::{
+        cli::{
+            cmd::{api::Api, wants_help, wants_raw},
+            components::{Component, Help},
+        },
+        common::str::ToString,
+        kurv::EggStatus,
+        printth,
     },
-    crate::common::str::ToString,
-    crate::kurv::EggStatus,
-    crate::printth,
     anyhow::Result,
     cli_table::{
         format::{
@@ -28,9 +30,20 @@ pub fn run(args: &mut Arguments) -> Result<()> {
     let api = Api::new();
     let eggs_summary_list = api.eggs_summary()?;
 
+    // if wants raw json output
+    if wants_raw(args) {
+        if eggs_summary_list.0.is_empty() {
+            printth!("{}", "[]");
+            return Ok(());
+        }
+
+        printth!("{}", serde_json::to_string_pretty(&eggs_summary_list)?);
+        return Ok(());
+    }
+
     if eggs_summary_list.0.is_empty() {
         printth!(indoc! {
-            "\nthere are no 🥚 in the kurv <warn>=(</warn>
+            "\nthere are no <yellow>⬮</yellow>'s in the kurv <warn>=(</warn>
                 
             <head>i</head> collect some <b>eggs</b> to get started:
               <dim>$</dim> <white>kurv</white> collect <green>my-egg.kurv</green>
@@ -39,7 +52,7 @@ pub fn run(args: &mut Arguments) -> Result<()> {
         return Ok(());
     }
 
-    printth!("\n<white>🥚</white> <dim>eggs snapshot</dim>\n");
+    printth!("\n<yellow>⬮</yellow> <dim>eggs snapshot</dim>\n");
 
     let rows: Vec<Vec<CellStruct>> = eggs_summary_list
         .0
