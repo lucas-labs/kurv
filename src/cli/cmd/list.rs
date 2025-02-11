@@ -116,7 +116,10 @@ fn help() -> Result<()> {
                 eggs and their current statuses."
             }),
             error: None,
-            options: Some(vec![("-h, --help", vec![], "Prints this help message"),]),
+            options: Some(vec![
+                ("-h, --help", vec![], "Prints this help message"),
+                ("-j, --json", vec![], "Prints the response in json format")
+            ]),
             subcommands: None
         }
         .render()

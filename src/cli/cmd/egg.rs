@@ -156,7 +156,10 @@ fn help() -> Result<()> {
                   <dim>$</dim> <white><b>kurv</b></white> egg <green>9778</green>        <dim># by pid</dim>" 
             }),
             error: None,
-            options: Some(vec![("-h, --help", vec![], "Prints this help message"),]),
+            options: Some(vec![
+                ("-h, --help", vec![], "Prints this help message"), 
+                ("-j, --json", vec![], "Prints the response in json format")
+            ]),
             subcommands: None
         }
         .render()
