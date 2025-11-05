@@ -8,7 +8,7 @@ use {
         kurv::{Egg, EggStatus},
         printth,
     },
-    anyhow::{anyhow, Result},
+    anyhow::{Result, anyhow},
     indoc::{formatdoc, indoc},
     pico_args::Arguments,
     std::path::PathBuf,

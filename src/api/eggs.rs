@@ -1,13 +1,14 @@
 use {
-    super::err,
-    super::Context,
-    crate::common::tcp::{json, Request, Response},
-    crate::kurv::EggStatus,
+    super::{Context, err},
     crate::{
-        common::{duration::humanize_duration, str::ToString},
-        kurv::{Egg, EggState},
+        common::{
+            duration::humanize_duration,
+            str::ToString,
+            tcp::{Request, Response, json},
+        },
+        kurv::{Egg, EggState, EggStatus},
     },
-    anyhow::{anyhow, Result},
+    anyhow::{Result, anyhow},
     serde::{Deserialize, Serialize},
 };
 
@@ -140,10 +141,7 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
                         let trim: &[_] = &['\r', '\n'];
                         return Ok(err(
                             400,
-                            format!(
-                                "can't change status to '{}'",
-                                status.str().trim_matches(trim)
-                            ),
+                            format!("can't change status to '{}'", status.str().trim_matches(trim)),
                         ));
                     }
                 };

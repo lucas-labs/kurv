@@ -3,8 +3,7 @@
 // but it might come in handy later on, if we want to implement running multiple workers/
 // instances of an egg at the same time (like a cluster)
 
-use command_group::GroupChild;
-use std::collections::BTreeMap;
+use {command_group::GroupChild, std::collections::BTreeMap};
 
 /// This structure is needed to manage worker pools for groups.
 /// It's a newtype pattern around a nested BTreeMap, which implements some convenience functions.

@@ -5,9 +5,7 @@ mod state;
 mod stdio;
 mod workers;
 
-pub use egg::Egg;
-pub use egg::EggState;
-pub use egg::EggStatus;
+pub use egg::{Egg, EggState, EggStatus};
 
 use {
     crate::common::Info,
@@ -15,12 +13,13 @@ use {
     command_group::CommandGroup,
     egg::EggStateUpsert,
     state::KurvState,
-    std::process::Command,
-    std::sync::{Arc, Mutex},
-    std::thread::sleep,
-    std::time::Duration,
-    stdio::clean_log_handles,
-    stdio::create_log_file_handles,
+    std::{
+        process::Command,
+        sync::{Arc, Mutex},
+        thread::sleep,
+        time::Duration,
+    },
+    stdio::{clean_log_handles, create_log_file_handles},
     workers::Workers,
 };
 

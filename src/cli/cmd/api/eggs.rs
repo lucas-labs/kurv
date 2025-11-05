@@ -1,5 +1,5 @@
 use {
-    super::{parse_response, Api, ParsedResponse},
+    super::{Api, ParsedResponse, parse_response},
     crate::{api, kurv::Egg, printth},
     anyhow::Result,
     api::eggs::EggsSummaryList,

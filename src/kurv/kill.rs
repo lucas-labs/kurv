@@ -1,8 +1,6 @@
-use log::warn;
-
 use {
     super::Kurv,
-    log::{debug, error},
+    log::{debug, error, warn},
 };
 
 impl Kurv {
@@ -70,7 +68,10 @@ impl Kurv {
                         egg.set_as_stopped();
                         unsynced = true;
 
-                        debug!("egg <green>{}</green> is stopped but was still on the workers list, it has now been removed", egg.name);
+                        debug!(
+                            "egg <green>{}</green> is stopped but was still on the workers list, it has now been removed",
+                            egg.name
+                        );
                     }
                     Err(e) => {
                         error!("error while waiting for child process {}: {}", id, e);

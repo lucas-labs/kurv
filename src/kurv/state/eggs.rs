@@ -1,18 +1,14 @@
 use {
     super::KurvState,
     crate::kurv::egg::Egg,
-    anyhow::{anyhow, Result},
+    anyhow::{Result, anyhow},
 };
 
 impl KurvState {
     /// 🥚 » adds a new `egg` to the state and **returns** its assigned `id`
     pub fn collect(&mut self, egg: &Egg) -> usize {
         // from self.eggs find the one with the highest egg.id
-        let next_id = self
-            .eggs.values().map(|egg| egg.id.unwrap_or(0))
-            .max()
-            .unwrap_or(0)
-            + 1;
+        let next_id = self.eggs.values().map(|egg| egg.id.unwrap_or(0)).max().unwrap_or(0) + 1;
 
         let mut new_egg = egg.clone();
         new_egg.id = Some(next_id);

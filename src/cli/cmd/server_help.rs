@@ -4,11 +4,12 @@
 //! This will execute general commands like `help` and `version`, depending
 //! on the arguments passed to the program.
 
-use indoc::indoc;
-
 use {
-    crate::cli::components::{Component, Help},
-    crate::printth,
+    crate::{
+        cli::components::{Component, Help},
+        printth,
+    },
+    indoc::indoc,
 };
 
 pub fn print() {
@@ -23,11 +24,7 @@ pub fn print() {
                 variable <white>KURV_SERVER</white> is setted to `true`"
             }),
             error: None,
-            options: Some(vec![(
-                "--force",
-                vec![],
-                "bypass the KURV_SERVER env var check"
-            )]),
+            options: Some(vec![("--force", vec![], "bypass the KURV_SERVER env var check")]),
             subcommands: None,
         }
         .render()

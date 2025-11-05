@@ -1,21 +1,16 @@
-use crate::cli::cmd::wants_raw;
-
 use {
-    crate::kurv::Egg,
-    anyhow::anyhow,
-    indoc::formatdoc,
-    std::{path::PathBuf, process::exit},
-};
-
-use {
-    crate::cli::{
-        cmd::{api::Api, is_option_or_flag, wants_help},
-        components::{Component, Help},
+    crate::{
+        cli::{
+            cmd::{api::Api, is_option_or_flag, wants_help, wants_raw},
+            components::{Component, Help},
+        },
+        kurv::Egg,
+        printth,
     },
-    crate::printth,
-    anyhow::Result,
-    indoc::indoc,
+    anyhow::{Result, anyhow},
+    indoc::{formatdoc, indoc},
     pico_args::Arguments,
+    std::{path::PathBuf, process::exit},
 };
 
 /// collects a new egg

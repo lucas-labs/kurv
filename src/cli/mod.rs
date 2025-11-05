@@ -1,6 +1,6 @@
 use {
     self::cmd::{stop_start::StopStartAction, wants_help},
-    anyhow::{anyhow, Result},
+    anyhow::{Result, anyhow},
     pico_args::Arguments,
 };
 

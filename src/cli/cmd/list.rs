@@ -10,11 +10,12 @@ use {
     },
     anyhow::Result,
     cli_table::{
+        Cell, CellStruct, Color, Style, Table,
         format::{
             Border, BorderBuilder, HorizontalLine, Justify, Separator, SeparatorBuilder,
             VerticalLine,
         },
-        print_stdout, Cell, CellStruct, Color, Style, Table,
+        print_stdout,
     },
     indoc::indoc,
     pico_args::Arguments,
@@ -82,20 +83,9 @@ pub fn run(args: &mut Arguments) -> Result<()> {
             "#".cell().bold(true).foreground_color(Some(Color::Blue)),
             "pid".cell().bold(true).foreground_color(Some(Color::Blue)),
             "name".cell().bold(true).foreground_color(Some(Color::Blue)),
-            "status"
-                .cell()
-                .bold(true)
-                .foreground_color(Some(Color::Blue)),
-            "↺"
-                .cell()
-                .bold(true)
-                .foreground_color(Some(Color::Blue))
-                .justify(Justify::Center),
-            "uptime"
-                .cell()
-                .bold(true)
-                .foreground_color(Some(Color::Blue))
-                .justify(Justify::Center),
+            "status".cell().bold(true).foreground_color(Some(Color::Blue)),
+            "↺".cell().bold(true).foreground_color(Some(Color::Blue)).justify(Justify::Center),
+            "uptime".cell().bold(true).foreground_color(Some(Color::Blue)).justify(Justify::Center),
         ])
         .border(border.build())
         .separator(separator.build());

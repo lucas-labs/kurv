@@ -1,10 +1,10 @@
 use {
-    anyhow::anyhow,
-    anyhow::Result,
+    anyhow::{Result, anyhow},
     log::error,
-    std::fs::File,
-    std::fs::{create_dir_all, OpenOptions},
-    std::path::{Path, PathBuf},
+    std::{
+        fs::{File, OpenOptions, create_dir_all},
+        path::{Path, PathBuf},
+    },
 };
 
 /// The type of an stdio file.
@@ -31,7 +31,7 @@ fn create_or_append_file(path: &Path) -> Result<File> {
     if let Some(parent) = path.parent() {
         create_dir_all(parent).map_err(|err| anyhow!("failed to create directories: {}", err))?;
     }
-    
+
     OpenOptions::new()
         .create(true)
         .append(true)

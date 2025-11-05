@@ -1,8 +1,7 @@
 pub mod load;
 
 use {
-    chrono::prelude::*,
-    chrono::Duration,
+    chrono::{Duration, prelude::*},
     serde::{Deserialize, Serialize},
     std::{collections::HashMap, path::PathBuf},
 };

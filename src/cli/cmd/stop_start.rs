@@ -1,16 +1,13 @@
-use anyhow::anyhow;
-use indoc::formatdoc;
-
-use crate::cli::cmd::wants_raw;
-
 use {
-    crate::cli::{
-        cmd::{api::Api, is_option_or_flag, wants_help},
-        components::{Component, Help},
+    crate::{
+        cli::{
+            cmd::{api::Api, is_option_or_flag, wants_help, wants_raw},
+            components::{Component, Help},
+        },
+        printth,
     },
-    crate::printth,
-    anyhow::Result,
-    indoc::indoc,
+    anyhow::{Result, anyhow},
+    indoc::{formatdoc, indoc},
     pico_args::Arguments,
 };
 

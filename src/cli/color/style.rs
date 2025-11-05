@@ -1,4 +1,4 @@
-use crossterm::style::{style, Attribute, Color, Stylize};
+use crossterm::style::{Attribute, Color, Stylize, style};
 
 /// converts a hex color to a crossterm `Color::Rgb`
 fn hex_to_rgb(hex: &str) -> Result<Color, std::num::ParseIntError> {
@@ -26,12 +26,8 @@ pub struct Style(pub Vec<StyleItem>);
 impl Style {
     /// merges two styles into one
     pub fn merge(&self, other: &Style) -> Style {
-        let merged_items: Vec<StyleItem> = self
-            .0
-            .iter()
-            .cloned()
-            .chain(other.0.iter().cloned())
-            .collect();
+        let merged_items: Vec<StyleItem> =
+            self.0.iter().cloned().chain(other.0.iter().cloned()).collect();
         Style(merged_items)
     }
 

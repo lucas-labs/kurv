@@ -1,7 +1,8 @@
-use anyhow::{anyhow, Result};
-use log::{Level, Metadata, Record};
-
-use crate::printth;
+use {
+    crate::printth,
+    anyhow::{Result, anyhow},
+    log::{Level, Metadata, Record},
+};
 
 pub struct Logger;
 

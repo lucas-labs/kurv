@@ -1,5 +1,7 @@
-use super::{Component, Logo};
-use std::fmt::Write;
+use {
+    super::{Component, Logo},
+    std::fmt::Write,
+};
 
 static SUMMARY: &str = "{summary}";
 static OPTIONS_HEAD: &str = "<head>options</head>";
@@ -68,12 +70,7 @@ impl<'a> Component for Help<'a> {
 impl<'a> Help<'a> {
     fn render_items(&self, items: &AliasedItem<'a>, separator: &str) -> String {
         // Calculate the gutter space dynamically based on the length of the longest item
-        let gutter_space = items
-            .iter()
-            .map(|(item, _, _)| item.len())
-            .max()
-            .unwrap_or(0)
-            + 4;
+        let gutter_space = items.iter().map(|(item, _, _)| item.len()).max().unwrap_or(0) + 4;
 
         let mut result = String::new();
 

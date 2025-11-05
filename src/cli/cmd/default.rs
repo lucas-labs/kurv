@@ -4,12 +4,13 @@
 //! This will execute general commands like `help` and `version`, depending
 //! on the arguments passed to the program.
 
-use indoc::indoc;
-
 use {
-    crate::cli::components::{Component, Help},
-    crate::printth,
+    crate::{
+        cli::components::{Component, Help},
+        printth,
+    },
     anyhow::Result,
+    indoc::indoc,
     pico_args::Arguments,
 };
 

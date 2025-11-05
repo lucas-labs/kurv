@@ -2,11 +2,13 @@ mod eggs;
 
 use {
     crate::common::tcp::ErrorResponse,
-    anyhow::{anyhow, Result},
+    anyhow::{Result, anyhow},
     serde::Deserialize,
-    std::io::{Read, Write},
-    std::net::TcpStream,
-    std::str,
+    std::{
+        io::{Read, Write},
+        net::TcpStream,
+        str,
+    },
 };
 
 // ApiResponse struct to hold response headers and body
@@ -43,19 +45,15 @@ impl Api {
             None => String::from("\r\n"),
         };
 
-        let request = format!(
-            "{} {} HTTP/1.1\r\nHost: {}\r\n{}\r\n",
-            method, path, self.host, body_str
-        );
+        let request =
+            format!("{} {} HTTP/1.1\r\nHost: {}\r\n{}\r\n", method, path, self.host, body_str);
 
         stream
             .write_all(request.as_bytes())
             .map_err(|_| anyhow!("failed to write to api server"))?;
 
         let mut buffer = Vec::new();
-        stream
-            .read_to_end(&mut buffer)
-            .map_err(|_| anyhow!("failed to read from api server"))?;
+        stream.read_to_end(&mut buffer).map_err(|_| anyhow!("failed to read from api server"))?;
 
         let response_str = str::from_utf8(&buffer)
             .map_err(|_| anyhow!("failed to parse response from api server"))?;

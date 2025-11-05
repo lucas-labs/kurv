@@ -3,8 +3,10 @@ pub mod err;
 pub mod status;
 
 use {
-    crate::common::tcp::{err, handle as handle_tcp, Handler, Request, Response},
-    crate::kurv::{InfoMtx, KurvStateMtx},
+    crate::{
+        common::tcp::{Handler, Request, Response, err, handle as handle_tcp},
+        kurv::{InfoMtx, KurvStateMtx},
+    },
     anyhow::Result,
     log::info,
     std::net::TcpListener,
@@ -97,10 +99,7 @@ pub fn start(info: InfoMtx, state: KurvStateMtx) {
     let port = std::env::var("KURV_API_PORT").unwrap_or("58787".to_string());
     let listener = TcpListener::bind(format!("{}:{}", host, port)).unwrap();
 
-    info!(
-        "<head>kurv</head> api listening on <green>http://{}:{}/</green>",
-        host, port
-    );
+    info!("<head>kurv</head> api listening on <green>http://{}:{}/</green>", host, port);
 
     let router = Router { info, state };
 

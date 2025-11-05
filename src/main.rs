@@ -1,8 +1,3 @@
-use std::process::exit;
-
-use indoc::formatdoc;
-use pico_args::Arguments;
-
 mod api;
 mod cli;
 mod common;
@@ -11,12 +6,13 @@ mod kurv;
 use {
     crate::cli::components::{Component, Logo},
     anyhow::Result,
-    cli::dispatch_command,
-    cli::DispatchResult,
+    cli::{DispatchResult, dispatch_command},
     common::log::Logger,
+    indoc::formatdoc,
     kurv::Kurv,
     log::Level,
-    std::thread,
+    pico_args::Arguments,
+    std::{process::exit, thread},
 };
 
 fn main() -> Result<()> {

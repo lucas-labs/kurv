@@ -24,8 +24,7 @@ impl Kurv {
                 // if child is Some, add it to the workers
                 if let Some(child) = child {
                     // so, we have a running egg, let's add it to the worker
-                    self.workers
-                        .add_child(None, key.clone(), egg.id.unwrap(), child);
+                    self.workers.add_child(None, key.clone(), egg.id.unwrap(), child);
                 }
 
                 unsynced = true;
