@@ -5,14 +5,10 @@ mod state;
 mod stdio;
 mod workers;
 
-pub use egg::{Egg, EggState, EggStatus};
-
 use {
     crate::common::Info,
     anyhow::Result,
     command_group::CommandGroup,
-    egg::EggStateUpsert,
-    state::KurvState,
     std::{
         process::Command,
         sync::{Arc, Mutex},
@@ -21,6 +17,11 @@ use {
     },
     stdio::{clean_log_handles, create_log_file_handles},
     workers::Workers,
+};
+
+pub use {
+    egg::{Egg, EggState, EggStateUpsert, EggStatus},
+    state::KurvState,
 };
 
 pub type KurvStateMtx = Arc<Mutex<KurvState>>;

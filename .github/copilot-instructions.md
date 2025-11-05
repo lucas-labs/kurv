@@ -170,3 +170,11 @@ When modifying:
 -   **API endpoints**: Add to `src/api/mod.rs:Router::routes()` array
 -   **State schema**: Start from `src/kurv/state/mod.rs:load()` and follow existing patterns
 -   **Terminal output**: Use `printth!` with theme tags, define new tags in `src/cli/color/mod.rs`
+
+## Working on Issues
+
+When addressing github issues, avoid creating comments in the issue thread.
+
+## Documentation
+
+Avoid creating new markdown documentation files, unless explicitly requested.
