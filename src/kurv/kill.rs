@@ -79,7 +79,7 @@ impl Kurv {
                     }
                 }
             } else {
-                // there's not child yet, it might've started as Stopped or PendingRemoval
+                // there's no child yet, it might've started as Stopped or PendingRemoval
                 // let's clean status to show that there nothing running
                 // - if the egg is restarting, we should set it to Pending instead to
                 //   allow it to start even from a stopped state
