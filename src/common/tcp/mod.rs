@@ -189,6 +189,12 @@ fn get_headers(user_headers: Vec<String>, body: &Vec<u8>) -> String {
     headers.push("Server: kurv".to_string());
     headers.push(format!("Content-Length: {}", body.len()));
     headers.push(format!("Date: {}", chrono::Utc::now().to_rfc2822()));
+
+    // cors headers
+    headers.push("Access-Control-Allow-Origin: *".to_string());
+    headers.push("Access-Control-Allow-Methods: GET, POST, OPTIONS".to_string());
+    headers.push("Access-Control-Allow-Headers: Content-Type".to_string());
+
     headers.extend(user_headers);
     headers.join("\r\n")
 }
