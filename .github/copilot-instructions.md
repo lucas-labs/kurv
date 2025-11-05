@@ -159,14 +159,7 @@ task build:release
 
 -   **State file**: `.kurv` (JSON, previously YAML) at `KURV_HOME` or exe dir
 -   **Egg logs**: `task_logs/{egg-name}.{stdout|stderr}` at `KURV_HOME`
--   **Egg configs**: User-provided `*.kurv` YAML files with name, command, args, cwd, env
-
-## Known Limitations
-
--   **No tests yet** - this is the author's first Rust project
--   **Windows-focused** - primarily tested on Windows 11
--   **No authentication** - local TCP server without security
--   **Single-instance eggs** - no clustering/multiple workers per egg (yet)
+-   **Egg configs**: User-provided `*.egg` (or any other name really) YAML files with name, command, args, cwd, env
 
 ## Making Changes
 
@@ -175,7 +168,5 @@ When modifying:
 -   **Egg lifecycle**: Update state machine in `src/kurv/mod.rs` main loop checks
 -   **CLI commands**: Add route in `src/cli/mod.rs:dispatch_command()` match arms
 -   **API endpoints**: Add to `src/api/mod.rs:Router::routes()` array
--   **State schema**: Handle backwards compatibility in `src/kurv/state/mod.rs:load()`
+-   **State schema**: Start from `src/kurv/state/mod.rs:load()` and follow existing patterns
 -   **Terminal output**: Use `printth!` with theme tags, define new tags in `src/cli/color/mod.rs`
-
-Always ensure `.kurv` file format changes maintain backwards compatibility or provide migration path.

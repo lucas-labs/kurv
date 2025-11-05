@@ -83,9 +83,9 @@ fn help() -> Result<()> {
                 "collects an egg and schedules it to be started.
                 
                 <head><b>example:</b></head>
-                  <dim>-> if we want to collect the egg <green>./egg.kurv</green>:</dim>
+                  <dim>-> if we want to collect the egg <green>./my.egg</green>:</dim>
                   
-                  <dim>$</dim> <white><b>kurv</b></white> collect <green>./egg.kurv</green>",
+                  <dim>$</dim> <white><b>kurv</b></white> collect <green>./my.egg</green>",
             }),
             error: None,
             options: Some(vec![

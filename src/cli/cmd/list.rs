@@ -47,7 +47,7 @@ pub fn run(args: &mut Arguments) -> Result<()> {
             "\nthere are no <yellow>⬮</yellow>'s in the kurv <warn>=(</warn>
                 
             <head>i</head> collect some <b>eggs</b> to get started:
-              <dim>$</dim> <white>kurv</white> collect <green>my-egg.kurv</green>
+              <dim>$</dim> <white>kurv</white> collect <green>my.egg</green>
             "
         });
         return Ok(());

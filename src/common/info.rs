@@ -73,8 +73,7 @@ impl Info {
             Err(_) => executable.parent().unwrap().to_path_buf(),
         };
 
-        // the path to the .kurv file in the kurv
-        // home directory it might not exist yet
+        // the path to the .kurv file in the kurv home directory (it might not exist yet)
         let kurv_file = kurv_home.join(".kurv");
 
         Ok(Paths {
