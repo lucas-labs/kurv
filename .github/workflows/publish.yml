@@ -43,7 +43,6 @@ jobs:
       - name: 🏗️ » build kurv
         uses: houseabsolute/actions-rust-cross@v0
         with:
-          cross-version: 
           command: "build"
           target: ${{ matrix.platform.target }}
           args: "--release"
