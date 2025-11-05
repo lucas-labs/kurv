@@ -79,11 +79,18 @@ impl Kurv {
                     }
                 }
             } else {
-                // there's not child yet, it might've started as Stopped or PendingRemoval
-                // let's clean status to show that there nothing running
+                // there's no child yet, it might've started as Stopped or PendingRemoval
+                // let's clean status to show that there is nothing running
+                // - if the egg is restarting, we should set it to Pending instead to
+                //   allow it to start even from a stopped state
                 // - set_as_stopped will change status to Stopped only if current status is
                 //   not PendingRemoval. This will allow the removal to take place.
-                egg.set_as_stopped();
+                if is_restarting {
+                    egg.reset_state();
+                    unsynced = true;
+                } else {
+                    egg.set_as_stopped();
+                }
             }
         }
 
