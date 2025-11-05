@@ -33,7 +33,7 @@ jobs:
             archive: kurv-windows-x86_64.zip
     steps:
       - name: 📁 » checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -41,11 +41,12 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: 🏗️ » build kurv
-        uses: houseabsolute/actions-rust-cross@v0
+        uses: houseabsolute/actions-rust-cross@v1
         with:
           command: "build"
           target: ${{ matrix.platform.target }}
           args: "--release"
+          strip: true
 
       - name: 📦 » archive kurv release
         shell: bash
@@ -72,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 » download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: kurv-*
           merge-multiple: true
@@ -81,7 +82,7 @@ jobs:
         run: ls -l -a -R
 
       - name: 🚀 » upload artifacts to github release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             kurv-*
@@ -92,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📁 » checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

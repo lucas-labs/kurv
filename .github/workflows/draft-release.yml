@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: 📁 » checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -45,12 +45,12 @@ jobs:
           next-version: v${{ steps.version.outputs.local-version }}
           
       - name: 🗑️ » delete outdated drafts
-        uses: hugo19941994/delete-draft-releases@v1.0.1
+        uses: hugo19941994/delete-draft-releases@v2.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🔖 » create draft release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
