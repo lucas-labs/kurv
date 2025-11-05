@@ -19,7 +19,6 @@
 > Heads up, this project is my Rust-learning playground and not production-ready yet:
 > 
 >   - I built this because my apps needed a process manager, and I had an itch to learn Rust. So, here it is... my first Rust project!
->   - No tests yet (oops!)
 >   - Tested only on Windows 11
 >   - Rust newbie alert! 🚨
 >   - Using it for my own projects, but not on a grand scale
@@ -164,10 +163,7 @@ $ kurv restart <egg:name|id|pid>
 - [ ] Remotely manage eggs
 - [ ] SSL support
 - [ ] Handle cors correctly
-
-And last but not least:
-
-- [ ] Tests (I know, I know... 🤭)
+- [ ] More tests
 
 #### Plugins / extensions
 
