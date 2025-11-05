@@ -31,6 +31,7 @@ impl Router {
     /// returns a list of routes which are composed of a method and a regex path
     fn routes(&self) -> Vec<RouteDef> {
         vec![
+            ("OPTIONS", ".*", Self::handle_cors_preflight), // Handle CORS preflight
             ("GET", "/", status::status),
             ("GET", "/status", status::status),
             ("GET", "/eggs", eggs::summary),
@@ -54,6 +55,15 @@ impl Router {
                 (route_re, handler)
             })
             .collect()
+    }
+
+    /// handles CORS preflight requests (OPTIONS method)
+    fn handle_cors_preflight(_request: &Request, _ctx: &Context) -> Result<Response> {
+        Ok(Response {
+            status: 204,
+            headers: vec![], // CORS headers added automatically by get_headers
+            body: vec![],
+        })
     }
 }
 
