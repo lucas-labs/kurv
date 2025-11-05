@@ -112,7 +112,7 @@ pub fn restart(request: &Request, ctx: &Context) -> Result<Response> {
     set_status(request, ctx, EggStatus::Restarting)
 }
 
-/// changes the status of an egg to Stopped or Pending
+/// changes the status of an egg
 pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result<Response> {
     if let Some(token) = request.path_params.get("egg_id") {
         let state = ctx.state.clone();

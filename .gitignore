@@ -21,6 +21,7 @@ rust-project.json
 ### Custom ###
 *.bkp
 *.kurv
+*.egg
 task_logs/
 .task
 
