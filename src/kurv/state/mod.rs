@@ -3,8 +3,7 @@ pub mod eggs;
 use {
     super::egg::Egg,
     crate::common::str::ToString,
-    anyhow::Context,
-    anyhow::Result,
+    anyhow::{Context, Result},
     log::debug,
     serde::{Deserialize, Serialize},
     std::{collections::BTreeMap, fs::File, path::PathBuf},
@@ -32,7 +31,7 @@ impl KurvState {
         let rdr = File::open(&path)
             .with_context(|| format!("failed to open eggs file: {}", path.display()))?;
 
-        let mut state: KurvState = serde_yaml::from_reader(rdr)
+        let mut state: KurvState = KurvState::deserialize(serde_saphyr::from_reader(rdr))
             .context(format!("failed to parse eggs file: {}", path.display()))?;
 
         // check that all the eggs have an id and if not, assign one
@@ -53,7 +52,7 @@ impl KurvState {
 
     /// saves the state to the given path
     pub fn save(&self, path: &PathBuf) -> Result<()> {
-        let serialized = serde_yaml::to_string(&self)?;
+        let serialized = serde_saphyr::to_string(&self)?;
         std::fs::write(path, serialized)?;
 
         let trim: &[_] = &['\r', '\n'];

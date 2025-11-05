@@ -1,11 +1,10 @@
 use {
     log::trace,
     serde::{Deserialize, Serialize},
-    serde_yaml,
     std::{
         collections::HashMap,
         fmt::Display,
-        io::{prelude::BufRead, BufReader, Read, Write},
+        io::{BufReader, Read, Write, prelude::BufRead},
         net::TcpStream,
     },
 };
@@ -54,7 +53,7 @@ pub struct Request {
 impl Display for Request {
     /// format as yaml
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let yaml = serde_yaml::to_string(&self).unwrap();
+        let yaml = serde_saphyr::to_string(&self).unwrap();
         write!(f, "{}", yaml)
     }
 }
@@ -144,10 +143,7 @@ pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
         .iter()
         .find_map(|header| {
             if header.to_lowercase().starts_with("content-length:") {
-                header
-                    .split_whitespace()
-                    .last()
-                    .and_then(|len| len.parse().ok())
+                header.split_whitespace().last().and_then(|len| len.parse().ok())
             } else {
                 None
             }

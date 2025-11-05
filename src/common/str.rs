@@ -1,4 +1,4 @@
-use {serde::Serialize, serde_yaml::to_string};
+use {serde::Serialize, serde_saphyr::to_string};
 
 pub fn str<T>(t: &T) -> String
 where
