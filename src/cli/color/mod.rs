@@ -1,13 +1,11 @@
-mod style;
+pub mod style;
 pub mod theme;
-
-pub use theme::Theme;
-
 use {
-    self::style::StyleItem,
     crossterm::style::{Attribute, Color},
     velcro::hash_map_from,
 };
+
+pub use {style::StyleItem, theme::Theme};
 
 /// 🎨 » returns the theme of the application
 pub fn get_theme() -> Theme {
