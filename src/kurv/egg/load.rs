@@ -9,8 +9,7 @@ use {
 impl Egg {
     pub fn load(path: PathBuf) -> Result<Egg> {
         if !path.exists() {
-            debug!(".kurv file not found, starting fresh (searched in {})", path.display());
-            debug!("you can set KURV_HOME to change the directory");
+            debug!("oops! {} not found", path.display());
             return Err(anyhow!(format!("file {} not found", path.display())));
         }
 
