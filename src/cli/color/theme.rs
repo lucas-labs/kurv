@@ -147,6 +147,7 @@ macro_rules! printth {
     // This pattern captures the arguments passed to the macro.
     ($($arg:tt)*) => {
         $crate::cli::color::theme::initialize_theme();
+        #[allow(clippy::macro_metavars_in_unsafe)]
         unsafe {
             let theme_ptr = std::ptr::addr_of!($crate::cli::color::theme::GLOBAL_THEME);
             if let Some(theme) = (*theme_ptr).as_ref() {

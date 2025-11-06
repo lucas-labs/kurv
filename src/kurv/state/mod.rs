@@ -28,7 +28,7 @@ impl KurvState {
             });
         }
 
-        let rdr = File::open(&path)
+        let rdr = File::open(path)
             .with_context(|| format!("failed to open eggs file: {}", path.display()))?;
 
         // try to deserialize as JSON first, fall back to YAML for backward compatibility
@@ -41,7 +41,7 @@ impl KurvState {
             Err(json_err) => {
                 debug!("failed to parse as JSON, trying YAML format: {}", json_err);
                 // Reopen the file since the reader was consumed
-                let rdr = File::open(&path)
+                let rdr = File::open(path)
                     .with_context(|| format!("failed to reopen eggs file: {}", path.display()))?;
 
                 KurvState::deserialize(serde_saphyr::from_reader(rdr)).with_context(|| {

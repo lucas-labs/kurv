@@ -14,6 +14,12 @@ pub struct Workers(pub BTreeMap<String, BTreeMap<String, (usize, GroupChild)>>);
 
 const DEFAULT_GROUP: &str = "default_kurv";
 
+impl Default for Workers {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Workers {
     /// Creates a new worker pool with a single default group.
     pub fn new() -> Self {

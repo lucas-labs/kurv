@@ -60,6 +60,12 @@ pub struct Info {
     pub paths: Paths,
 }
 
+impl Default for Info {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Info {
     /// Creates a new instance of Info
     pub fn new() -> Info {

@@ -48,17 +48,17 @@ impl KurvState {
     ///   - the name (key) of the egg
     pub fn get_id_by_token(&self, token: &str) -> Option<usize> {
         // Try to parse the token as usize to check if it's an id
-        if let Ok(id) = token.parse::<usize>() {
-            if let Some(egg) = self.get(id) {
-                return egg.id;
-            }
+        if let Ok(id) = token.parse::<usize>()
+            && let Some(egg) = self.get(id)
+        {
+            return egg.id;
         }
 
         // Try to find an egg with the given pid and return its id
-        if let Ok(pid) = token.parse::<u32>() {
-            if let Some(egg) = self.get_by_pid(pid) {
-                return egg.id;
-            }
+        if let Ok(pid) = token.parse::<u32>()
+            && let Some(egg) = self.get_by_pid(pid)
+        {
+            return egg.id;
         }
 
         // Check if the token corresponds to an egg name and return its id
@@ -77,14 +77,14 @@ impl KurvState {
     pub fn remove(&mut self, id: usize) -> Result<Egg> {
         if let Some(egg) = self.get(id).cloned() {
             // check that egg.state.pid is None
-            if let Some(state) = egg.state.clone() {
-                if state.pid > 0 {
-                    return Err(anyhow!(
-                        "Egg '{}' is still running with pid {}, please stop it first",
-                        egg.name,
-                        state.pid
-                    ));
-                }
+            if let Some(state) = egg.state.clone()
+                && state.pid > 0
+            {
+                return Err(anyhow!(
+                    "Egg '{}' is still running with pid {}, please stop it first",
+                    egg.name,
+                    state.pid
+                ));
             }
 
             self.eggs.remove(&egg.name);

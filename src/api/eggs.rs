@@ -89,10 +89,10 @@ pub fn get(request: &Request, ctx: &Context) -> Result<Response> {
 
         let id = state.get_id_by_token(token);
 
-        if let Some(id) = id {
-            if let Some(egg) = state.get(id) {
-                return Ok(json(200, egg.clone()));
-            }
+        if let Some(id) = id
+            && let Some(egg) = state.get(id)
+        {
+            return Ok(json(200, egg.clone()));
         }
 
         return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, token)));
@@ -129,40 +129,37 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
 
         let id = state.get_id_by_token(token);
 
-        if let Some(id) = id {
-            if let Some(egg) = state.get_mut(id) {
-                match status {
-                    EggStatus::Pending => {
-                        // we can only change to pending if its state is currently Stopped
-                        if let Some(state) = egg.state.clone() {
-                            if state.status != EggStatus::Stopped {
-                                return Ok(err(
-                                    400,
-                                    format!("egg {} is already running", egg.name),
-                                ));
-                            }
-                        }
+        if let Some(id) = id
+            && let Some(egg) = state.get_mut(id)
+        {
+            match status {
+                EggStatus::Pending => {
+                    // we can only change to pending if its state is currently Stopped
+                    if let Some(state) = egg.state.clone()
+                        && state.status != EggStatus::Stopped
+                    {
+                        return Ok(err(400, format!("egg {} is already running", egg.name)));
                     }
-                    EggStatus::Stopped => {}
-                    EggStatus::PendingRemoval => {
-                        // prevent removing plugins via this endpoint
-                        if egg.is_plugin() {
-                            return Ok(err(403, CANNOT_REMOVE_MSG.to_string()));
-                        }
+                }
+                EggStatus::Stopped => {}
+                EggStatus::PendingRemoval => {
+                    // prevent removing plugins via this endpoint
+                    if egg.is_plugin() {
+                        return Ok(err(403, CANNOT_REMOVE_MSG.to_string()));
                     }
-                    EggStatus::Restarting => {}
-                    _ => {
-                        let trim: &[_] = &['\r', '\n'];
-                        return Ok(err(
-                            400,
-                            format!("can't change status to '{}'", status.str().trim_matches(trim)),
-                        ));
-                    }
-                };
+                }
+                EggStatus::Restarting => {}
+                _ => {
+                    let trim: &[_] = &['\r', '\n'];
+                    return Ok(err(
+                        400,
+                        format!("can't change status to '{}'", status.str().trim_matches(trim)),
+                    ));
+                }
+            };
 
-                egg.set_status(status);
-                return Ok(json(200, egg.clone()));
-            }
+            egg.set_status(status);
+            return Ok(json(200, egg.clone()));
         }
 
         return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, token)));
