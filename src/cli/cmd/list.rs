@@ -1,7 +1,10 @@
 use {
     crate::{
         cli::{
-            cmd::{api::Api, wants_help, wants_raw},
+            cmd::{
+                api::{Api, EggKind},
+                wants_help, wants_raw,
+            },
             components::{Component, Help},
         },
         common::str::ToString,
@@ -17,19 +20,19 @@ use {
         },
         print_stdout,
     },
-    indoc::indoc,
+    indoc::formatdoc,
     pico_args::Arguments,
 };
 
 /// prints eggs state summary snapshot
-pub fn run(args: &mut Arguments) -> Result<()> {
+pub fn run(args: &mut Arguments, kind: EggKind) -> Result<()> {
     if wants_help(args) {
-        return help();
+        return help(&kind);
     }
 
     let (border, separator) = get_borders();
     let api = Api::new();
-    let eggs_summary_list = api.eggs_summary()?;
+    let eggs_summary_list = api.eggs_summary(&kind)?;
 
     // if wants raw json output
     if wants_raw(args) {
@@ -43,17 +46,21 @@ pub fn run(args: &mut Arguments) -> Result<()> {
     }
 
     if eggs_summary_list.0.is_empty() {
-        printth!(indoc! {
-            "\nthere are no <yellow>⬮</yellow>'s in the kurv <warn>=(</warn>
+        printth!(
+            "{}",
+            formatdoc! {
+                "\nthere are no <yellow>{}</yellow>'s in the kurv <warn>=(</warn>
                 
-            <head>i</head> collect some <b>eggs</b> to get started:
-              <dim>$</dim> <white>kurv</white> collect <green>my.egg</green>
-            "
-        });
+                <head>i</head> collect some <b>eggs</b> to get started:
+                  <dim>$</dim> <white>kurv</white> collect <green>my.egg</green>
+                ", 
+                kind.as_display_str()
+            }
+        );
         return Ok(());
     }
 
-    printth!("\n<yellow>⬮</yellow> <dim>eggs snapshot</dim>\n");
+    printth!("\n<yellow>⬮</yellow> <dim>{} snapshot</dim>\n", kind.as_str());
 
     let rows: Vec<Vec<CellStruct>> = eggs_summary_list
         .0
@@ -96,14 +103,19 @@ pub fn run(args: &mut Arguments) -> Result<()> {
     Ok(())
 }
 
-fn help() -> Result<()> {
+fn help(kind: &EggKind) -> Result<()> {
     printth!(
         "{}",
         Help {
-            command: "kurv list",
-            summary: Some(indoc! {
+            command: if kind == &EggKind::Eggs {
+                "kurv list"
+            } else {
+                "kurv plugins"
+            },
+            summary: Some(&formatdoc! {
                 "shows a snapshot table with a list of all collected
-                eggs and their current statuses."
+                {} and their current statuses.",
+                kind.as_str()
             }),
             error: None,
             options: Some(vec![

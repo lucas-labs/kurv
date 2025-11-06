@@ -1,5 +1,6 @@
 use {
     self::cmd::{stop_start::StopStartAction, wants_help},
+    crate::cli::cmd::EggKind,
     anyhow::{Result, anyhow},
     pico_args::Arguments,
 };
@@ -29,9 +30,10 @@ pub fn dispatch_command() -> Result<DispatchResult> {
                     // server will be handled by the main function
                     Ok(DispatchResult::Server)
                 }
-                "list" | "l" | "ls" | "snaps" => {
-                    cmd::list::run(&mut arguments).map(|_| DispatchResult::Dispatched)
-                }
+                "list" | "l" | "ls" | "snaps" => cmd::list::run(&mut arguments, EggKind::Eggs)
+                    .map(|_| DispatchResult::Dispatched),
+                "plugins" => cmd::list::run(&mut arguments, EggKind::Plugins)
+                    .map(|_| DispatchResult::Dispatched),
                 "egg" => cmd::egg::run(&mut arguments).map(|_| DispatchResult::Dispatched),
                 "stop" => cmd::stop_start::run(&mut arguments, StopStartAction::Stop)
                     .map(|_| DispatchResult::Dispatched),

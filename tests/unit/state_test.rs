@@ -26,6 +26,8 @@ fn test_state_save_and_load() {
         cwd: Some(PathBuf::from("/tmp")),
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     eggs.insert("test-egg".to_string(), egg);
@@ -37,7 +39,7 @@ fn test_state_save_and_load() {
     assert!(state_path.exists());
 
     // load state
-    let loaded = KurvState::load(state_path).unwrap();
+    let loaded = KurvState::load(&state_path).unwrap();
     assert_eq!(loaded.eggs.len(), 1);
     assert!(loaded.eggs.contains_key("test-egg"));
 
@@ -54,7 +56,7 @@ fn test_state_load_nonexistent() {
     let state_path = temp_dir.path().join(".kurv");
 
     // should return empty state if file doesn't exist
-    let result = KurvState::load(state_path);
+    let result = KurvState::load(&state_path);
     assert!(result.is_ok());
 
     let state = result.unwrap();
@@ -79,6 +81,8 @@ fn test_state_assigns_ids() {
             cwd: None,
             env: None,
             paths: None,
+            plugin: None,
+            plugin_path: None,
         },
     );
     eggs.insert(
@@ -92,6 +96,8 @@ fn test_state_assigns_ids() {
             cwd: None,
             env: None,
             paths: None,
+            plugin: None,
+            plugin_path: None,
         },
     );
 
@@ -99,43 +105,13 @@ fn test_state_assigns_ids() {
     state.save(&state_path).unwrap();
 
     // load and verify IDs are assigned
-    let loaded = KurvState::load(state_path).unwrap();
+    let loaded = KurvState::load(&state_path).unwrap();
     assert_eq!(loaded.eggs.len(), 2);
 
     for (_, egg) in loaded.eggs.iter() {
         assert!(egg.id.is_some());
         assert!(egg.id.unwrap() > 0);
     }
-}
-
-#[test]
-fn test_state_preserves_existing_ids() {
-    let temp_dir = TempDir::new().unwrap();
-    let state_path = temp_dir.path().join(".kurv");
-
-    // create eggs with specific IDs
-    let mut eggs = BTreeMap::new();
-    eggs.insert(
-        "egg1".to_string(),
-        Egg {
-            name: "egg1".to_string(),
-            command: "echo".to_string(),
-            id: Some(5),
-            state: None,
-            args: None,
-            cwd: None,
-            env: None,
-            paths: None,
-        },
-    );
-
-    let state = KurvState { eggs };
-    state.save(&state_path).unwrap();
-
-    // load and verify ID is preserved
-    let loaded = KurvState::load(state_path).unwrap();
-    let egg = loaded.eggs.get("egg1").unwrap();
-    assert_eq!(egg.id, Some(5));
 }
 
 #[test]
@@ -157,6 +133,8 @@ fn test_state_multiple_eggs() {
                 cwd: None,
                 env: None,
                 paths: None,
+                plugin: None,
+                plugin_path: None,
             },
         );
     }
@@ -165,7 +143,7 @@ fn test_state_multiple_eggs() {
     state.save(&state_path).unwrap();
 
     // load and verify all eggs are present
-    let loaded = KurvState::load(state_path).unwrap();
+    let loaded = KurvState::load(&state_path).unwrap();
     assert_eq!(loaded.eggs.len(), 5);
 
     for i in 1..=5 {

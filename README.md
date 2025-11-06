@@ -17,30 +17,26 @@
 
 > [!WARNING]  
 > Heads up, this project is my Rust-learning playground and not production-ready yet:
-> 
->   - I built this because my apps needed a process manager, and I had an itch to learn Rust. So, here it is... my first Rust project!
->   - Tested only on Windows 11
->   - Rust newbie alert! 🚨
->   - Using it for my own projects, but not on a grand scale
-
+>
+> -   I built this because my apps needed a process manager, and I had an itch to learn Rust. So, here it is... my first Rust project!
+> -   Tested only on Windows 11
+> -   Rust newbie alert! 🚨
+> -   Using it for my own projects, but not on a grand scale
 
 ## Why 𝐤𝐮𝐫𝐯?
 
-
-
 So, why the name 𝐤𝐮𝐫𝐯? Well, it means "basket" in many languages I don't speak, like Norwegian (but it sounded cool 😄). Think of 𝐤𝐮𝐫𝐯 as a basket for your apps. In kurv, we call each deployed app as an `egg`. So, let's go and collect some eggs 🥚 in your basket 🧺.
-
 
 ## Installation
 
-> [!NOTE] 
-> 𝐤𝐮𝐫𝐯 can run either as a server or as a CLI client, using the same binary. 
+> [!NOTE]
+> 𝐤𝐮𝐫𝐯 can run either as a server or as a CLI client, using the same binary.
 >
 > The server is responsible for managing the eggs, while the client is used to interact with the server and tell it what to do or ask it for information.
 
 ### Download binaries
 
-Download the latest release [from GitHub](https://github.com/lucas-labs/kurv/releases). 
+Download the latest release [from GitHub](https://github.com/lucas-labs/kurv/releases).
 
 ### crates.io
 
@@ -50,10 +46,9 @@ You can also install it from [crates.io](https://crates.io/crates/kurv) using `c
 cargo install kurv
 ```
 
-## Usage 
+## Usage
 
 ![kurv usage](.github/kurv.gif)
-
 
 ### Start the server
 
@@ -64,25 +59,27 @@ kurv server
 ```
 
 > [!IMPORTANT]
-> - 𝐤𝐮𝐫𝐯 will create a file called `.kurv` where it will store the current
-> state of the server. The file will be created in the same directory where
-> the binary is located or in the path specified by the `KURV_HOME_KEY`
-> environment variable.
 >
-> - since 𝐤𝐮𝐫𝐯 can be used both as a server and as a client, if you want
-> to run it as a server, you need to set the `KURV_SERVER` environment
-> to `true`. This is just a safety measure to prevent you from running
-> the server when you actually want to run the client.
-> To bypass this, you can use the `--force` flag (`kurv server --force`)
+> -   𝐤𝐮𝐫𝐯 will create a file called `.kurv` where it will store the current
+>     state of the server. The file will be created in the same directory where
+>     the binary is located or in the path specified by the `KURV_HOME_KEY`
+>     environment variable.
+>
+> -   since 𝐤𝐮𝐫𝐯 can be used both as a server and as a client, if you want
+>     to run it as a server, you need to set the `KURV_SERVER` environment
+>     to `true`. This is just a safety measure to prevent you from running
+>     the server when you actually want to run the client.
+>     To bypass this, you can use the `--force` flag (`kurv server --force`)
 
 ### Collect some 🥚
+
 To deploy/start/daemonize an app (collect an egg), do:
 
 ```bash
 kurv collect <egg-cfg-path>
 ```
 
-The path should point to a YAML file that contains the configuration for the egg. 
+The path should point to a YAML file that contains the configuration for the egg.
 
 It should look something like this:
 
@@ -90,11 +87,11 @@ It should look something like this:
 name: fastapi # the name of the egg / should be unique
 command: poetry # the command/program to run
 args: # the arguments to pass to the command
-  - run
-  - serve
+    - run
+    - serve
 cwd: /home/user/my-fastapi-app # the working directory in which the command will be run
 env: # the environment variables to pass to the command
-  FASTAPI_PORT: 8080
+    FASTAPI_PORT: 8080
 ```
 
 This will run the command `poetry run serve` in `/home/user/my-fastapi-app` with the environment variable `FASTAPI_PORT` set to `8080`.
@@ -120,7 +117,7 @@ $ kurv list
 
 For details on a specific egg:
 
-``` sh
+```sh
 $ kurv egg <egg:name|id|pid>
 ```
 
@@ -130,7 +127,7 @@ This will show you the egg's configuration, process details, etc.
 
 To halt an egg without removing it:
 
-``` sh
+```sh
 $ kurv stop <egg:name|id|pid>
 ```
 
@@ -141,7 +138,7 @@ you want to start it again later.
 
 To actually remove an egg, run:
 
-``` sh
+```sh
 $ kurv remove <egg:name|id|pid>
 ```
 
@@ -151,44 +148,65 @@ It will stop the process and remove the egg from the basket.
 
 If you need the process to be restarted, run:
 
-``` sh
+```sh
 $ kurv restart <egg:name|id|pid>
 ```
+
+### 🔌 Plugins
+
+Want to extend 𝐤𝐮𝐫𝐯 with your own tools? Kurv support plugins! They're special eggs that 𝐤𝐮𝐫𝐯 automatically discovers and manages.
+
+#### How it works
+
+1. Drop an executable starting with `kurv-` in `<KURV_HOME>/plugins/`
+2. Make it respond to `--kurv-cfg` with JSON config, same as an egg config
+3. Restart 𝐤𝐮𝐫𝐯 server
+4. That's it! The plugin is now running 🎉
+
+**View your plugins:**
+
+```sh
+$ kurv plugins        # list all plugins
+```
+
+Plugins can be started, stopped, and restarted just like regular eggs, but they can't be removed (stop kurv and delete the executable instead).
 
 ### To do list
 
 𝐤𝐮𝐫𝐯 is still under development. Here are some of the things I'm planning to add:
 
-- [ ] Simple password protection
-- [ ] Remotely manage eggs
-- [ ] SSL support
-- [ ] Handle cors correctly
-- [ ] More tests
+-   [ ] Simple password protection
+-   [ ] Remotely manage eggs
+-   [ ] SSL support
+-   [ ] More tests
 
 #### Plugins / extensions
 
-Since 𝐤𝐮𝐫𝐯 is a process manager, we can easily extend its functionality by adding 
-plugin eggs (simple eggs managed by 𝐤𝐮𝐫𝐯 itself that provide additional functionality). 
+Since 𝐤𝐮𝐫𝐯 is a process manager, we can easily extend its functionality by adding
+plugin eggs (simple eggs managed by 𝐤𝐮𝐫𝐯 itself that provide additional functionality).
 
 Here are some ideas I have for plugins:
 
-- [ ] Web UI
-- [ ] Log Viewer 
-- [ ] Log Rotation
+-   [ ] Web UI
+-   [ ] Log Viewer
+-   [ ] Log Rotation
 
 ### Inspiration
 
 #### pm2
+
 Inspired by the robust process manager, [pm2](https://pm2.keymetrics.io/), my goal with 𝐤𝐮𝐫𝐯 was to create a lightweight alternative. Not that pm2 is a resource hog, but I found myself in a server with extremely limited resources. Plus, I was itching for an excuse to dive into Rust, and voila, 𝐤𝐮𝐫𝐯 was born.
 
 #### eggsecutor
+
 Derived from [eggsecutor](https://github.com/lucas-labs/kurv), 𝐤𝐮𝐫𝐯 adopted the whimsical term "eggs" to represent deployed applications.
 
 #### pueue
-Insights from [pueue](https://github.com/Nukesor/pueue) were instrumental in helping me understand how to manage processes in Rust.
 
+Insights from [pueue](https://github.com/Nukesor/pueue) were instrumental in helping me understand how to manage processes in Rust.
 
 <br><br>
 
--------
+---
+
 With 🧉 from Argentina 🇦🇷

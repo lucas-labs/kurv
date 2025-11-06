@@ -102,7 +102,7 @@ impl Kurv {
         let info = &self.info.lock().unwrap();
         let mut egg = egg.clone();
         let egg_name = egg.name.clone();
-        let log_dir = info.paths.kurv_home.clone();
+        let log_dir = info.paths.logs_dir.clone();
 
         let ((stdout_path, stdout_log), (stderr_path, stderr_log)) =
             match create_log_file_handles(&egg_name, &log_dir) {

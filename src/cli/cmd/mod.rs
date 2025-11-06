@@ -8,6 +8,8 @@ pub mod list;
 pub mod server_help;
 pub mod stop_start;
 
+pub(crate) use api::EggKind;
+
 /// Returns true if the user wants help with the command
 pub fn wants_help(args: &mut Arguments) -> bool {
     args.contains(["-h", "--help"])

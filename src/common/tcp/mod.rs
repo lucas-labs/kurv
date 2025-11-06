@@ -101,6 +101,7 @@ pub fn err(status: u16, msg: String) -> Response {
 }
 
 /// Handles an incoming TCP connection stream.
+#[allow(clippy::sliced_string_as_bytes)]
 pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
     let mut buf_reader = BufReader::new(&mut stream);
 
@@ -184,7 +185,7 @@ pub fn handle(mut stream: TcpStream, handler: &impl Handler) {
 }
 
 /// Returns the final headers string including content-length and other defaults.
-fn get_headers(user_headers: Vec<String>, body: &Vec<u8>) -> String {
+fn get_headers(user_headers: Vec<String>, body: &[u8]) -> String {
     let mut headers = Vec::new();
     headers.push("Server: kurv".to_string());
     headers.push(format!("Content-Length: {}", body.len()));

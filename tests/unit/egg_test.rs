@@ -14,6 +14,8 @@ fn test_egg_state_transitions() {
         cwd: None,
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     // initially should have no state
@@ -43,6 +45,8 @@ fn test_egg_should_spawn() {
         cwd: None,
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     // new eggs without state should spawn
@@ -76,6 +80,8 @@ fn test_egg_upsert_state() {
         cwd: None,
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     // upsert on egg without state should create state
@@ -119,6 +125,8 @@ fn test_egg_set_as_errored() {
         cwd: None,
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     // set as running first
@@ -144,6 +152,8 @@ fn test_egg_status_checks() {
         cwd: None,
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     egg.set_status(EggStatus::Running);
@@ -174,6 +184,8 @@ fn test_egg_reset_state() {
         cwd: None,
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     // set as running with some state
@@ -201,6 +213,8 @@ fn test_egg_increment_and_reset_try_count() {
         cwd: None,
         env: None,
         paths: None,
+        plugin: None,
+        plugin_path: None,
     };
 
     egg.set_status(EggStatus::Pending);

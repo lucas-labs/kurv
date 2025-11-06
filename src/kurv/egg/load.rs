@@ -7,6 +7,7 @@ use {
 };
 
 impl Egg {
+    /// loads an egg config from the given path
     pub fn load(path: PathBuf) -> Result<Egg> {
         if !path.exists() {
             debug!("oops! {} not found", path.display());

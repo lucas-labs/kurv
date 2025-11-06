@@ -41,11 +41,9 @@ fn create_or_append_file(path: &Path) -> Result<File> {
 
 /// Get the path to the log file of a task.
 pub fn get_log_paths(task_name: &str, path: &Path) -> (PathBuf, PathBuf) {
-    let task_log_dir = path.join("task_logs");
-
     (
-        task_log_dir.join(stdio_filename(task_name, StdioFile::Stdout)),
-        task_log_dir.join(stdio_filename(task_name, StdioFile::Stderr)),
+        path.join(stdio_filename(task_name, StdioFile::Stdout)),
+        path.join(stdio_filename(task_name, StdioFile::Stderr)),
     )
 }
 
@@ -63,15 +61,15 @@ fn stdio_filename(task_name: &str, file_type: StdioFile) -> String {
 pub fn clean_log_handles(task_name: &String, path: &Path) {
     let (stdout_path, stderr_path) = get_log_paths(task_name, path);
 
-    if stdout_path.exists() {
-        if let Err(err) = std::fs::remove_file(stdout_path) {
-            error!("Failed to remove stdout file for task {task_name} with error {err:?}");
-        };
-    }
+    if stdout_path.exists()
+        && let Err(err) = std::fs::remove_file(stdout_path)
+    {
+        error!("Failed to remove stdout file for task {task_name} with error {err:?}");
+    };
 
-    if stderr_path.exists() {
-        if let Err(err) = std::fs::remove_file(stderr_path) {
-            error!("Failed to remove stderr file for task {task_name} with error {err:?}");
-        };
-    }
+    if stderr_path.exists()
+        && let Err(err) = std::fs::remove_file(stderr_path)
+    {
+        error!("Failed to remove stderr file for task {task_name} with error {err:?}");
+    };
 }

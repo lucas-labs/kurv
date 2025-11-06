@@ -1,5 +1,4 @@
 mod eggs;
-
 use {
     crate::common::tcp::ErrorResponse,
     anyhow::{Result, anyhow},
@@ -10,6 +9,8 @@ use {
         str,
     },
 };
+
+pub use eggs::EggKind;
 
 // ApiResponse struct to hold response headers and body
 pub(crate) struct ApiResponse {
@@ -30,7 +31,7 @@ impl Api {
         let port = std::env::var("KURV_API_PORT")
             .unwrap_or("58787".to_string())
             .parse::<u16>()
-            .unwrap_or(5878);
+            .unwrap_or(58787);
 
         Api { host, port }
     }

@@ -27,14 +27,22 @@ pub struct EggSummary {
 
 const WRONG_ID_MSG: &str = "missing or invalid egg id";
 const NOT_FOUND_MSG: &str = "egg not found";
+const CANNOT_REMOVE_MSG: &str = "plugins cannot be removed via API; to remove a plugin, stop kurv and delete the executable instead";
 
-pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
+pub fn summary(request: &Request, ctx: &Context) -> Result<Response> {
     let state = ctx.state.clone();
     let state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
-    let eggs = state.eggs.clone();
+    let kind = request.query_params.get("kind").map(|s| s.as_str()).unwrap_or("eggs");
+
+    let eggs = match kind {
+        "plugins" => state.get_plugins(),
+        "eggs" => state.get_eggs(),
+        _ => state.get_eggs(),
+    };
+
     let mut summary_list = Vec::new();
 
-    for (_, egg) in eggs.iter() {
+    for egg in eggs {
         let summary = EggSummary {
             id: match egg.id {
                 Some(ref id) => *id,
@@ -80,10 +88,10 @@ pub fn get(request: &Request, ctx: &Context) -> Result<Response> {
 
         let id = state.get_id_by_token(token);
 
-        if let Some(id) = id {
-            if let Some(egg) = state.get(id) {
-                return Ok(json(200, egg.clone()));
-            }
+        if let Some(id) = id
+            && let Some(egg) = state.get(id)
+        {
+            return Ok(json(200, egg.clone()));
         }
 
         return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, token)));
@@ -120,35 +128,37 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
 
         let id = state.get_id_by_token(token);
 
-        if let Some(id) = id {
-            if let Some(egg) = state.get_mut(id) {
-                match status {
-                    EggStatus::Pending => {
-                        // we can only change to pending if its state is currently Stopped
-                        if let Some(state) = egg.state.clone() {
-                            if state.status != EggStatus::Stopped {
-                                return Ok(err(
-                                    400,
-                                    format!("egg {} is already running", egg.name),
-                                ));
-                            }
-                        }
+        if let Some(id) = id
+            && let Some(egg) = state.get_mut(id)
+        {
+            match status {
+                EggStatus::Pending => {
+                    // we can only change to pending if its state is currently Stopped
+                    if let Some(state) = egg.state.clone()
+                        && state.status != EggStatus::Stopped
+                    {
+                        return Ok(err(400, format!("egg {} is already running", egg.name)));
                     }
-                    EggStatus::Stopped => {}
-                    EggStatus::PendingRemoval => {}
-                    EggStatus::Restarting => {}
-                    _ => {
-                        let trim: &[_] = &['\r', '\n'];
-                        return Ok(err(
-                            400,
-                            format!("can't change status to '{}'", status.str().trim_matches(trim)),
-                        ));
+                }
+                EggStatus::Stopped => {}
+                EggStatus::PendingRemoval => {
+                    // prevent removing plugins via this endpoint
+                    if egg.is_plugin() {
+                        return Ok(err(403, CANNOT_REMOVE_MSG.to_string()));
                     }
-                };
+                }
+                EggStatus::Restarting => {}
+                _ => {
+                    let trim: &[_] = &['\r', '\n'];
+                    return Ok(err(
+                        400,
+                        format!("can't change status to '{}'", status.str().trim_matches(trim)),
+                    ));
+                }
+            };
 
-                egg.set_status(status);
-                return Ok(json(200, egg.clone()));
-            }
+            egg.set_status(status);
+            return Ok(json(200, egg.clone()));
         }
 
         return Ok(err(404, format!("{}: {}", NOT_FOUND_MSG, token)));

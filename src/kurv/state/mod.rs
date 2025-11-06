@@ -19,7 +19,7 @@ pub struct KurvState {
 impl KurvState {
     /// tries to load the state from the given
     /// path, or creates a new one if it doesn't exist
-    pub fn load(path: PathBuf) -> Result<KurvState> {
+    pub fn load(path: &PathBuf) -> Result<KurvState> {
         if !path.exists() {
             debug!(".kurv file not found, starting fresh (searched in {})", path.display());
             debug!("you can set KURV_HOME to change the directory");
@@ -28,7 +28,7 @@ impl KurvState {
             });
         }
 
-        let rdr = File::open(&path)
+        let rdr = File::open(path)
             .with_context(|| format!("failed to open eggs file: {}", path.display()))?;
 
         // try to deserialize as JSON first, fall back to YAML for backward compatibility
@@ -41,7 +41,7 @@ impl KurvState {
             Err(json_err) => {
                 debug!("failed to parse as JSON, trying YAML format: {}", json_err);
                 // Reopen the file since the reader was consumed
-                let rdr = File::open(&path)
+                let rdr = File::open(path)
                     .with_context(|| format!("failed to reopen eggs file: {}", path.display()))?;
 
                 KurvState::deserialize(serde_saphyr::from_reader(rdr)).with_context(|| {
@@ -50,19 +50,17 @@ impl KurvState {
             }
         };
 
-        // check that all the eggs have an id and if not, assign one
+        // remove all existing plugins from state to start fresh
+        state.eggs.retain(|_, egg| !egg.plugin.unwrap_or(false));
+
+        // reassign ids to all eggs
         let mut next_id = 1;
         for (_, egg) in state.eggs.iter_mut() {
-            if egg.id.is_none() {
-                egg.id = Some(next_id);
-                next_id += 1;
-            } else {
-                next_id = egg.id.unwrap() + 1;
-            }
+            egg.id = Some(next_id);
+            next_id += 1;
         }
 
-        debug!("eggs collected");
-
+        debug!("{} eggs collected!", state.eggs.len());
         Ok(state)
     }
 
