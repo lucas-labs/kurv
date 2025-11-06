@@ -158,7 +158,7 @@ Want to extend 𝐤𝐮𝐫𝐯 with your own tools? Kurv support plugins! They'
 
 #### How it works
 
-1. Drop an executable starting with `kurv-` in `<KURV_HOME>/plugins/` (or `KURV_PLUGINS_DIR` if set)
+1. Drop an executable starting with `kurv-` in `<KURV_HOME>/plugins/`
 2. Make it respond to `--kurv-cfg` with JSON config, same as an egg config
 3. Restart 𝐤𝐮𝐫𝐯 server
 4. That's it! The plugin is now running 🎉
