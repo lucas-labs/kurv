@@ -97,7 +97,7 @@ impl Kurv {
         }
 
         // replace running eggs to Pending status, so they are started
-        // on bootstra
+        // on bootstrap
         for (_, egg) in state.eggs.iter_mut() {
             if let Some(ref mut state) = egg.state
                 && state.status == EggStatus::Running
