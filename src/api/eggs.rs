@@ -40,7 +40,6 @@ pub fn summary(request: &Request, ctx: &Context) -> Result<Response> {
         _ => state.get_eggs(),
     };
 
-    // let eggs = state.get_eggs(include_plugins);
     let mut summary_list = Vec::new();
 
     for egg in eggs {
