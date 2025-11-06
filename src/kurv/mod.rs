@@ -1,5 +1,6 @@
 mod egg;
 mod kill;
+mod plugins;
 mod spawn;
 mod state;
 mod stdio;
@@ -82,11 +83,18 @@ impl Kurv {
 
     /// loads application state from .kurv file.
     ///
-    /// this should only be called on bootstrap, as it will expect all
-    /// eggs to not be running
+    /// this should only be called on bootstrap, as it will expect all not to be be running.
+    /// also discovers and collects plugin eggs from the plugins directory.
     pub fn collect() -> Result<(InfoMtx, KurvStateMtx)> {
         let info = Info::new();
-        let mut state = KurvState::load(info.paths.kurv_file.clone()).unwrap();
+        let mut state = KurvState::load(&info.paths.kurv_file).unwrap();
+
+        // discover and collect new plugins eggs
+        let plugin_eggs = plugins::discover(&info);
+        for (plugin_path, plugin_egg) in plugin_eggs {
+            log::info!("collecting plugin: {} from {}", plugin_egg.name, plugin_path.display());
+            state.collect(&plugin_egg);
+        }
 
         // replace running eggs to Pending status, so they are started
         // on bootstra

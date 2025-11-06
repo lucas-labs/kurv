@@ -1,6 +1,8 @@
 use {
-    super::get_theme,
-    super::style::{Style, StyleItem},
+    super::{
+        get_theme,
+        style::{Style, StyleItem},
+    },
     htmlparser::{Token, Tokenizer},
     std::{collections::HashMap, sync::Once},
 };
@@ -53,10 +55,8 @@ impl Theme {
                     Style(vec![])
                 });
 
-                let child_style: Vec<String> = children
-                    .iter()
-                    .map(|child| self.apply_node(child, &node_style))
-                    .collect();
+                let child_style: Vec<String> =
+                    children.iter().map(|child| self.apply_node(child, &node_style)).collect();
 
                 (node_style, child_style)
             }
@@ -76,10 +76,7 @@ impl Theme {
     pub fn apply(&self, text: &str) -> String {
         let nodes = parse(text);
 
-        nodes
-            .iter()
-            .map(|node| self.apply_node(node, &Style(vec![])))
-            .collect::<String>()
+        nodes.iter().map(|node| self.apply_node(node, &Style(vec![]))).collect::<String>()
     }
 }
 
@@ -102,7 +99,10 @@ pub fn parse(string: &str) -> Vec<ParsedNode> {
             Token::ElementStart { prefix, local, .. } => {
                 stack.push((prefix, local, vec![]));
             }
-            Token::ElementEnd { end: htmlparser::ElementEnd::Close(_, local), .. } => {
+            Token::ElementEnd {
+                end: htmlparser::ElementEnd::Close(_, local),
+                ..
+            } => {
                 let (_, _, content) = stack.pop().unwrap();
                 let parsed_node = ParsedNode::Tag(local.to_string(), content);
                 if let Some(top) = stack.last_mut() {
@@ -126,9 +126,7 @@ pub fn parse(string: &str) -> Vec<ParsedNode> {
     nodes
         .into_iter()
         .flat_map(|node| match node {
-            ParsedNode::Tag(tag, content) if tag == WRAPPER_ELEMENT => {
-                content.clone()
-            }
+            ParsedNode::Tag(tag, content) if tag == WRAPPER_ELEMENT => content.clone(),
             _ => vec![node],
         })
         .collect::<Vec<_>>()

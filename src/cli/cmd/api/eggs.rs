@@ -6,9 +6,31 @@ use {
     std::process::exit,
 };
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum EggKind {
+    Eggs,
+    Plugins,
+}
+
+impl EggKind {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            EggKind::Eggs => "eggs",
+            EggKind::Plugins => "plugins",
+        }
+    }
+
+    pub fn as_display_str(&self) -> &'static str {
+        match self {
+            EggKind::Eggs => "⬮",
+            EggKind::Plugins => "plugin",
+        }
+    }
+}
+
 impl Api {
-    pub fn eggs_summary(&self) -> Result<EggsSummaryList> {
-        let response = self.get("/eggs")?;
+    pub fn eggs_summary(&self, kind: &EggKind) -> Result<EggsSummaryList> {
+        let response = self.get(format!("/eggs?kind={}", kind.as_str()).as_ref())?;
         let eggs_summary_list: EggsSummaryList = serde_json::from_str(&response.body)?;
 
         Ok(eggs_summary_list)

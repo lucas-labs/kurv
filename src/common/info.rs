@@ -23,6 +23,12 @@ pub struct Paths {
 
     /// the path to the .kurv file in the kurv home directory
     pub kurv_file: PathBuf,
+
+    /// the path to the plugins directory inside the kurv home directory
+    pub plugins_dir: PathBuf,
+
+    /// logs directory
+    pub logs_dir: PathBuf,
 }
 
 /// General information about the app
@@ -33,6 +39,12 @@ pub struct Info {
 
     /// the version of the application
     pub version: String,
+
+    /// API Hostname
+    pub api_host: String,
+
+    /// API Port
+    pub api_port: u16,
 
     /// the version compilation name
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,6 +66,11 @@ impl Info {
         Info {
             name: env!("CARGO_PKG_NAME").to_string(),
             version: env!("CARGO_PKG_VERSION").to_string(),
+            api_host: std::env::var("KURV_API_HOST").unwrap_or("127.0.0.1".to_string()),
+            api_port: std::env::var("KURV_API_PORT")
+                .unwrap_or("58787".to_string())
+                .parse::<u16>()
+                .unwrap_or(58787),
             version_name: option_env!("KURV_VERSION_NAME"),
             description: env!("CARGO_PKG_DESCRIPTION").to_string(),
             pid: std::process::id(),
@@ -73,14 +90,26 @@ impl Info {
             Err(_) => executable.parent().unwrap().to_path_buf(),
         };
 
+        // logs directory, try to get it from KURV_LOGS_DIR env variable
+        // or default to kurv_home/task_logs
+        let logs_dir = match env::var("KURV_LOGS_DIR") {
+            Ok(dir) => PathBuf::from(dir),
+            Err(_) => kurv_home.join("task_logs"),
+        };
+
         // the path to the .kurv file in the kurv home directory (it might not exist yet)
         let kurv_file = kurv_home.join(".kurv");
+
+        // the path to the plugins directory inside the kurv home directory
+        let plugins_dir = kurv_home.join("plugins");
 
         Ok(Paths {
             executable,
             working_dir,
             kurv_home,
             kurv_file,
+            plugins_dir,
+            logs_dir,
         })
     }
 }

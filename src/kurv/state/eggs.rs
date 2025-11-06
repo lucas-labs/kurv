@@ -93,4 +93,14 @@ impl KurvState {
             Err(anyhow!("Egg with id '{}' not found", id))
         }
     }
+
+    /// 🥚 » retrieves all eggs, optionally filtering out plugins
+    pub fn get_eggs(&self) -> Vec<&Egg> {
+        self.eggs.values().filter(|egg| !egg.plugin.unwrap_or(false)).collect()
+    }
+
+    /// 🥚 » retrieves only plugin eggs
+    pub fn get_plugins(&self) -> Vec<&Egg> {
+        self.eggs.values().filter(|egg| egg.plugin.unwrap_or(false)).collect()
+    }
 }

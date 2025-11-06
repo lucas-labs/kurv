@@ -27,14 +27,23 @@ pub struct EggSummary {
 
 const WRONG_ID_MSG: &str = "missing or invalid egg id";
 const NOT_FOUND_MSG: &str = "egg not found";
+const CANNOT_REMOVE_MSG: &str = "plugins cannot be removed via API";
 
-pub fn summary(_request: &Request, ctx: &Context) -> Result<Response> {
+pub fn summary(request: &Request, ctx: &Context) -> Result<Response> {
     let state = ctx.state.clone();
     let state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
-    let eggs = state.eggs.clone();
+    let kind = request.query_params.get("kind").map(|s| s.as_str()).unwrap_or("eggs");
+
+    let eggs = match kind {
+        "plugins" => state.get_plugins(),
+        "eggs" => state.get_eggs(),
+        _ => state.get_eggs(),
+    };
+
+    // let eggs = state.get_eggs(include_plugins);
     let mut summary_list = Vec::new();
 
-    for (_, egg) in eggs.iter() {
+    for egg in eggs {
         let summary = EggSummary {
             id: match egg.id {
                 Some(ref id) => *id,
@@ -135,7 +144,12 @@ pub fn set_status(request: &Request, ctx: &Context, status: EggStatus) -> Result
                         }
                     }
                     EggStatus::Stopped => {}
-                    EggStatus::PendingRemoval => {}
+                    EggStatus::PendingRemoval => {
+                        // prevent removing plugins via this endpoint
+                        if egg.is_plugin() {
+                            return Ok(err(403, CANNOT_REMOVE_MSG.to_string()));
+                        }
+                    }
                     EggStatus::Restarting => {}
                     _ => {
                         let trim: &[_] = &['\r', '\n'];

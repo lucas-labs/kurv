@@ -3,11 +3,41 @@
 version: '3'
 
 tasks:
+  dev:
+    cmds:
+      - cargo watch -x "run server --force"
+
+  dev:nowatch:
+    cmds:
+      - cargo run server --force
+
   build:release:
     desc: ⚡ build kurv «release»
     cmds:
       - cargo build --release
       - python check_size.py
+
+  fmt:check:
+    cmds:
+      - cargo +nightly fmt --all --check
+
+
+  lint:check:
+    cmds:
+      - cargo clippy --workspace --all-targets --all-features
+
+  lint:
+    cmds:
+      - cargo clippy --workspace --all-targets --all-features --fix --allow-staged
+
+  check:
+    cmds:
+      - task: fmt:check
+      - task: lint:check
+
+  fmt:
+    cmds:
+      - cargo +nightly fmt --all
 
   build:
     desc: ⚡ build kurv «debug»

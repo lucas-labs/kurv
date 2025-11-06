@@ -76,6 +76,14 @@ pub struct Egg {
     /// paths to the stdout and stderr log files
     #[serde(skip_serializing_if = "Option::is_none")]
     pub paths: Option<EggPaths>,
+
+    /// marks this egg as a plugin (auto-discovered from plugins directory)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plugin: Option<bool>,
+
+    /// path to the plugin executable (only for plugin eggs)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plugin_path: Option<PathBuf>,
 }
 
 impl Egg {
@@ -290,5 +298,9 @@ impl Egg {
         } else {
             false
         }
+    }
+
+    pub fn is_plugin(&self) -> bool {
+        self.plugin.unwrap_or(false)
     }
 }

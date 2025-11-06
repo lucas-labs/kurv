@@ -40,7 +40,6 @@ impl Router {
             ("POST", "/eggs/(?P<egg_id>.*)/start", eggs::start),
             ("POST", "/eggs/(?P<egg_id>.*)/restart", eggs::restart),
             ("POST", "/eggs/(?P<egg_id>.*)/remove", eggs::remove),
-            ("POST", "/eggs/(?P<egg_id>.*)/egg", eggs::remove),
             ("GET", "/eggs/(?P<egg_id>.*)", eggs::get),
             (".*", ".*", err::not_allowed), // last resort
         ]
@@ -105,8 +104,12 @@ impl Handler for Router {
 
 /// starts the api server
 pub fn start(info: InfoMtx, state: KurvStateMtx) {
-    let host = std::env::var("KURV_API_HOST").unwrap_or("127.0.0.1".to_string());
-    let port = std::env::var("KURV_API_PORT").unwrap_or("58787".to_string());
+    // get host and port from info
+    let (host, port) = {
+        let info = info.lock().unwrap();
+        (info.api_host.clone(), info.api_port)
+    };
+
     let listener = TcpListener::bind(format!("{}:{}", host, port)).unwrap();
 
     info!("<head>kurv</head> api listening on <green>http://{}:{}/</green>", host, port);

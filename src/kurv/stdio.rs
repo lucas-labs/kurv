@@ -41,11 +41,9 @@ fn create_or_append_file(path: &Path) -> Result<File> {
 
 /// Get the path to the log file of a task.
 pub fn get_log_paths(task_name: &str, path: &Path) -> (PathBuf, PathBuf) {
-    let task_log_dir = path.join("task_logs");
-
     (
-        task_log_dir.join(stdio_filename(task_name, StdioFile::Stdout)),
-        task_log_dir.join(stdio_filename(task_name, StdioFile::Stderr)),
+        path.join(stdio_filename(task_name, StdioFile::Stdout)),
+        path.join(stdio_filename(task_name, StdioFile::Stderr)),
     )
 }
 
