@@ -83,7 +83,7 @@ impl Kurv {
 
     /// loads application state from .kurv file.
     ///
-    /// this should only be called on bootstrap, as it will expect all not to be be running.
+    /// this should only be called on bootstrap, as it will expect all eggs to not be running.
     /// also discovers and collects plugin eggs from the plugins directory.
     pub fn collect() -> Result<(InfoMtx, KurvStateMtx)> {
         let info = Info::new();
