@@ -27,7 +27,7 @@ pub struct EggSummary {
 
 const WRONG_ID_MSG: &str = "missing or invalid egg id";
 const NOT_FOUND_MSG: &str = "egg not found";
-const CANNOT_REMOVE_MSG: &str = "plugins cannot be removed via API";
+const CANNOT_REMOVE_MSG: &str = "plugins cannot be removed via API; to remove a plugin, stop kurv and delete the executable instead";
 
 pub fn summary(request: &Request, ctx: &Context) -> Result<Response> {
     let state = ctx.state.clone();
