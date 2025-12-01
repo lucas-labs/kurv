@@ -1,0 +1,21 @@
+meta {
+  name: merge
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{url}}/eggs/:id/env
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "NEW_ENVVAR": "foobar"
+  }
+}

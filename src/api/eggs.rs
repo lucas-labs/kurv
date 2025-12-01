@@ -1,3 +1,5 @@
+pub mod env;
+
 use {
     super::{Context, err},
     crate::{
@@ -176,6 +178,9 @@ pub fn collect(request: &Request, ctx: &Context) -> Result<Response> {
             let state = ctx.state.clone();
             let mut state = state.lock().map_err(|_| anyhow!("failed to lock state"))?;
 
+            // TODO: if egg already exists, accept a --recollect flag to update its config
+            //       when provided, --recollect will update the egg config and set it's status
+            //       to `Restarting`
             if state.contains_key(egg.name.clone()) {
                 return Ok(err(
                     409,
