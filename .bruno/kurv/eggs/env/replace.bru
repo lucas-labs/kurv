@@ -1,0 +1,21 @@
+meta {
+  name: replace
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{url}}/eggs/:id/env
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "PYTHONIOENCODING": "UTF-8"
+  }
+}

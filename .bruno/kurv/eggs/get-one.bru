@@ -1,0 +1,15 @@
+meta {
+  name: get-one
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/eggs/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 1
+}

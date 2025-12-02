@@ -29,6 +29,10 @@ pub struct EggState {
     pub try_count: u32,
     pub error: Option<String>,
 
+    /// flag to trigger a state sync in any moment, not triggered by a status change
+    #[serde(skip, default)]
+    pub uncsynced: bool,
+
     #[serde(default = "default_pid")]
     pub pid: u32,
 }
@@ -97,6 +101,7 @@ impl Egg {
                 try_count: 0,
                 error: None,
                 pid: 0,
+                uncsynced: false,
             });
         }
     }
@@ -130,6 +135,7 @@ impl Egg {
                 try_count: state.try_count.unwrap_or(0),
                 error: state.error,
                 pid: state.pid.unwrap_or(0),
+                uncsynced: false,
             });
         }
     }
@@ -297,6 +303,24 @@ impl Egg {
             egg_state.status == status
         } else {
             false
+        }
+    }
+
+    /// checks if the egg's state has unsynced changes
+    pub fn is_state_unsynced(&self) -> bool {
+        let result = if let Some(ref egg_state) = self.state {
+            egg_state.uncsynced
+        } else {
+            false
+        };
+
+        result
+    }
+
+    /// marks the egg's state as synced or unsynced
+    pub fn set_synced(&mut self, synced: bool) {
+        if let Some(ref mut egg_state) = self.state {
+            egg_state.uncsynced = !synced;
         }
     }
 

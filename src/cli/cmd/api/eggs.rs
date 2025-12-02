@@ -3,7 +3,7 @@ use {
     crate::{api, kurv::Egg, printth},
     anyhow::Result,
     api::eggs::EggsSummaryList,
-    std::process::exit,
+    std::{collections::HashMap, process::exit},
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -52,6 +52,36 @@ impl Api {
 
     pub fn eggs_post(&self, route: &str, body: &str) -> Result<Egg> {
         let response = self.post(format!("/eggs{route}").as_ref(), body)?;
+        let maybe_egg: ParsedResponse<Egg> = parse_response(&response)?;
+
+        match maybe_egg {
+            ParsedResponse::Failure(err) => {
+                printth!("<error>[err: {}]</error> {}\n", err.code, err.message);
+                exit(1)
+            }
+
+            ParsedResponse::Success(egg) => Ok(egg),
+        }
+    }
+
+    /// update egg environment variables, either merging or replacing them
+    pub fn update_egg_env(
+        &self,
+        id: &str,
+        env: &HashMap<String, String>,
+        replace: bool,
+    ) -> Result<Egg> {
+        // merge: HTTP PATCH /eggs/{id}/env
+        // replace: HTTP PUT /eggs/{id}/env
+
+        let body = serde_json::to_string(&env)?;
+
+        let response = if replace {
+            self.put(format!("/eggs/{}/env", id).as_ref(), body.as_str())?
+        } else {
+            self.patch(format!("/eggs/{}/env", id).as_ref(), body.as_str())?
+        };
+
         let maybe_egg: ParsedResponse<Egg> = parse_response(&response)?;
 
         match maybe_egg {

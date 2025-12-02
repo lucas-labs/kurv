@@ -44,6 +44,7 @@ pub fn dispatch_command() -> Result<DispatchResult> {
                 "restart" => cmd::stop_start::run(&mut arguments, StopStartAction::Restart)
                     .map(|_| DispatchResult::Dispatched),
                 "collect" => cmd::collect::run(&mut arguments).map(|_| DispatchResult::Dispatched),
+                "env" => cmd::env::run(&mut arguments).map(|_| DispatchResult::Dispatched),
                 _ => cmd::default::run(
                     &mut arguments,
                     Some(format!("Invalid usage | Command '{}' not recognized", subcmd).as_str()),

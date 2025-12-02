@@ -40,6 +40,8 @@ impl Router {
             ("POST", "/eggs/(?P<egg_id>.*)/start", eggs::start),
             ("POST", "/eggs/(?P<egg_id>.*)/restart", eggs::restart),
             ("POST", "/eggs/(?P<egg_id>.*)/remove", eggs::remove),
+            ("PUT", "/eggs/(?P<egg_id>.*)/env", eggs::env::replace),
+            ("PATCH", "/eggs/(?P<egg_id>.*)/env", eggs::env::merge),
             ("GET", "/eggs/(?P<egg_id>.*)", eggs::get),
             (".*", ".*", err::not_allowed), // last resort
         ]
