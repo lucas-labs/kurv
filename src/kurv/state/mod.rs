@@ -44,7 +44,7 @@ impl KurvState {
                 let rdr = File::open(path)
                     .with_context(|| format!("failed to reopen eggs file: {}", path.display()))?;
 
-                KurvState::deserialize(serde_saphyr::from_reader(rdr)).with_context(|| {
+                serde_saphyr::from_reader(rdr).with_context(|| {
                     format!("failed to parse eggs file as JSON or YAML: {}", path.display())
                 })?
             }
