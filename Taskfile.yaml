@@ -5,30 +5,29 @@ version: '3'
 tasks:
   dev:
     cmds:
-      - cargo watch -x "run server --force"
+      - cargo +stable watch -x "run server --force"
 
   dev:nowatch:
     cmds:
-      - cargo run server --force
+      - cargo +stable run server --force
 
   build:release:
     desc: ⚡ build kurv «release»
     cmds:
-      - cargo build --release
+      - cargo +stable build --release
       - python check_size.py
 
   fmt:check:
     cmds:
       - cargo +nightly fmt --all --check
 
-
   lint:check:
     cmds:
-      - cargo clippy --workspace --all-targets --all-features
+      - cargo +stable clippy --workspace --all-targets --all-features
 
   lint:
     cmds:
-      - cargo clippy --workspace --all-targets --all-features --fix --allow-staged
+      - cargo +stable clippy --workspace --all-targets --all-features --fix --allow-staged
 
   check:
     cmds:
@@ -42,7 +41,7 @@ tasks:
   build:
     desc: ⚡ build kurv «debug»
     cmds:
-      - cargo build
+      - cargo +stable build
       - python check_size.py
 
   # the following tasks are for testing the ci workflow locally, using the
