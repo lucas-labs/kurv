@@ -15,8 +15,13 @@ jobs:
       - name: 📁 » checkout repository
         uses: actions/checkout@v6
 
-      - name: 🦀 » install rust
+      - name: 🦀 » install stable rust
         uses: dtolnay/rust-toolchain@stable
+      
+      - name: 🦀 » install nightly rust (for rustfmt)
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+            components: rustfmt
 
       - name: 🗃️ » cache cargo
         uses: Swatinem/rust-cache@v2
