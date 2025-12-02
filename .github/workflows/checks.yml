@@ -17,11 +17,13 @@ jobs:
 
       - name: 🦀 » install stable rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       
       - name: 🦀 » install nightly rust (for rustfmt)
         uses: dtolnay/rust-toolchain@nightly
         with:
-            components: rustfmt
+          components: rustfmt
 
       - name: 🗃️ » cache cargo
         uses: Swatinem/rust-cache@v2
