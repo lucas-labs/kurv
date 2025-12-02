@@ -4,6 +4,7 @@ mod plugins;
 mod spawn;
 mod state;
 mod stdio;
+mod sync;
 mod workers;
 
 use {
@@ -68,6 +69,9 @@ impl Kurv {
 
             // removal needs to happen after stops, to avoid orphans
             unsynced = self.check_removal_pending_eggs() || unsynced;
+
+            // check eggs for unsynced state changes, manually triggered (not state changes)
+            unsynced = self.check_unsynced_eggs() || unsynced;
 
             if unsynced {
                 // let state = self.state.clone();

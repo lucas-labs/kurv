@@ -21,6 +21,7 @@ fn test_state_save_and_load() {
             try_count: 0,
             error: None,
             pid: 1234,
+            uncsynced: false,
         }),
         args: Some(vec!["hello".to_string()]),
         cwd: Some(PathBuf::from("/tmp")),

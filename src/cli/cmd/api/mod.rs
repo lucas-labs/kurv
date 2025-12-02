@@ -77,6 +77,11 @@ impl Api {
         self.request("POST", path, Some(body))
     }
 
+    // Method to perform HTTP PATCH request
+    pub(crate) fn patch(&self, path: &str, body: &str) -> Result<ApiResponse> {
+        self.request("PATCH", path, Some(body))
+    }
+
     // Method to perform HTTP PUT request
     #[allow(dead_code)]
     pub(crate) fn put(&self, path: &str, body: &str) -> Result<ApiResponse> {

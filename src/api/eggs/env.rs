@@ -37,6 +37,8 @@ pub fn update_env(request: &Request, ctx: &Context, replace: bool) -> Result<Res
                 egg.env = Some(merged_env);
             }
 
+            egg.set_synced(false);
+
             return Ok(json(200, egg.clone()));
         }
 

@@ -202,6 +202,7 @@ pub fn collect(request: &Request, ctx: &Context) -> Result<Response> {
                     try_count: 0,
                     error: None,
                     pid: 0,
+                    uncsynced: false,
                 },
             };
 

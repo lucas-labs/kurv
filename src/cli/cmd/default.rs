@@ -55,6 +55,7 @@ fn help(err: Option<&str>) {
                 ("restart", vec![], "restarts a running egg"),
                 ("remove", vec![], "removes an egg"),
                 ("collect", vec![], "collects and starts a new egg"),
+                ("env", vec![], "manages environment variables for eggs"),
             ]),
         }
         .render()
