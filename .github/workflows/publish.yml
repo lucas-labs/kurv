@@ -61,7 +61,7 @@ jobs:
           cd -
 
       - name: 📤 » upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: kurv-${{ matrix.platform.os_name }}
           path: ${{ matrix.platform.archive }}
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 » download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: kurv-*
           merge-multiple: true
