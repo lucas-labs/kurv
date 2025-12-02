@@ -21,7 +21,6 @@ tasks:
     cmds:
       - cargo +nightly fmt --all --check
 
-
   lint:check:
     cmds:
       - cargo clippy --workspace --all-targets --all-features

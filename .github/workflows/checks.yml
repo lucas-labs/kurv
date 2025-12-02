@@ -1,0 +1,36 @@
+name: "✅ » checks"
+
+on:
+  workflow_call:
+
+defaults:
+  run:
+    shell: 'bash'
+
+jobs:
+  check:
+    name: "✅ » check"
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📁 » checkout repository
+        uses: actions/checkout@v6
+
+      - name: 🦀 » install rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 🗃️ » cache cargo
+        uses: Swatinem/rust-cache@v2
+     
+      - name: 🧊 » install Task
+        uses: go-task/setup-task@v1
+        with:
+          version: 3.x
+
+      - name: 🏗️ » build kurv
+        run: task build
+
+      - name: 🧪 » test kurv
+        run: cargo test
+      
+      - name: 🕵️ » check lint & format
+        run: task checks
