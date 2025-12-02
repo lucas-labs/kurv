@@ -17,6 +17,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check:
+    uses: ./.github/workflows/checks.yml
+    secrets: inherit
+
   draft_release:
     if: 
       github.event_name == 'push' &&
