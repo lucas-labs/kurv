@@ -71,6 +71,8 @@ jobs:
     name: 🚀 » publish github release
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: 📥 » download artifacts
         uses: actions/download-artifact@v6
@@ -84,6 +86,7 @@ jobs:
       - name: 🚀 » upload artifacts to github release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.release.tag_name }}
           files: |
             kurv-*
 
