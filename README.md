@@ -15,14 +15,6 @@
 <br>
 <br>
 
-> [!WARNING]  
-> Heads up, this project is my Rust-learning playground and not production-ready yet:
->
-> -   I built this because my apps needed a process manager, and I had an itch to learn Rust. So, here it is... my first Rust project!
-> -   Tested only on Windows 11
-> -   Rust newbie alert! 🚨
-> -   Using it for my own projects, but not on a grand scale
-
 ## Why 𝐤𝐮𝐫𝐯?
 
 So, why the name 𝐤𝐮𝐫𝐯? Well, it means "basket" in many languages I don't speak, like Norwegian (but it sounded cool 😄). Think of 𝐤𝐮𝐫𝐯 as a basket for your apps. In kurv, we call each deployed app as an `egg`. So, let's go and collect some eggs 🥚 in your basket 🧺.
@@ -166,7 +158,7 @@ Want to extend 𝐤𝐮𝐫𝐯 with your own tools? Kurv support plugins! They'
 **View your plugins:**
 
 ```sh
-$ kurv plugins        # list all plugins
+$ kurv plugins # list all plugins
 ```
 
 Plugins can be started, stopped, and restarted just like regular eggs, but they can't be removed (stop kurv and delete the executable instead).
@@ -176,6 +168,8 @@ Plugins can be started, stopped, and restarted just like regular eggs, but they 
 𝐤𝐮𝐫𝐯 is still under development. Here are some of the things I'm planning to add:
 
 -   [ ] Simple password protection
+-   [ ] Scheduled egg runs: allow eggs to not be long-running processes, but instead run at
+        specific times or intervals (cron-like). This might be implemented as a plugin "kurv-cron".
 -   [ ] Remotely manage eggs
 -   [ ] SSL support
 -   [ ] More tests
@@ -188,8 +182,13 @@ plugin eggs (simple eggs managed by 𝐤𝐮𝐫𝐯 itself that provide additio
 Here are some ideas I have for plugins:
 
 -   [ ] Web UI
--   [ ] Log Viewer
+-   [ ] Log Viewer (`kurv tail <egg>` (livestream) and `kurv logs <egg> --lines N` (last N lines))
 -   [ ] Log Rotation
+
+##### Plugin system improvements
+-   [ ] Command-based plugins: allow plugins to register custom commands that can be run
+        using `kurv <plugin-command> [args...]` (requires ability to register not-long-running
+        eggs that run a command and exit, instead of being daemonized)
 
 ### Inspiration
 
@@ -199,11 +198,13 @@ Inspired by the robust process manager, [pm2](https://pm2.keymetrics.io/), my go
 
 #### eggsecutor
 
-Derived from [eggsecutor](https://github.com/lucas-labs/kurv), 𝐤𝐮𝐫𝐯 adopted the whimsical term "eggs" to represent deployed applications.
+Derived from [eggsecutor](https://github.com/lucas-labs/kurv), 𝐤𝐮𝐫𝐯 adopted the whimsical term
+"eggs" to represent deployed applications.
 
 #### pueue
 
-Insights from [pueue](https://github.com/Nukesor/pueue) were instrumental in helping me understand how to manage processes in Rust.
+Insights from [pueue](https://github.com/Nukesor/pueue) were instrumental in helping me understand
+how to manage processes in Rust.
 
 <br><br>
 
