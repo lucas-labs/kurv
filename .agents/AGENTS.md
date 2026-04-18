@@ -9,7 +9,6 @@ This repo is a **cargo workspace** (resolver 3, edition 2024). Root [Cargo.toml]
 - [app/kurv/](app/kurv/) — the main `kurv` binary (server + CLI client). All kurv-specific deps live here, **not** in `[workspace.dependencies]`.
 - [plugins/](plugins/) — official plugin crates, auto-globbed via `members = ["plugins/*"]`. First example: [plugins/kurv-ui/](plugins/kurv-ui/) (hello-world placeholder).
 - [crates/kurv-plugin-sdk/](crates/kurv-plugin-sdk/) — shared types and entrypoint for plugin crates (`publish = false`). Exposes `PluginConfig`, `KurvEnv`, and `start(configure, run_loop)` — see [crates/kurv-plugin-sdk/src/lib.rs](crates/kurv-plugin-sdk/src/lib.rs). Plugin `main`s should delegate to `start` rather than hand-roll arg parsing.
-- [examples/plugins/](examples/plugins/) — demo plugins (e.g. `kurv-hello-world.bat`) that aren't part of the build graph.
 
 `[workspace.dependencies]` only holds deps genuinely shared across crates. Promote a dep upward the first time a **second** crate needs it — don't pre-promote.
 
@@ -66,7 +65,7 @@ Both are cloned into the API thread. Partial egg updates go through `EggStateUps
 
 Executables prefixed `kurv-` dropped into `<KURV_HOME>/plugins/` are auto-discovered at server start. Each is invoked with `--kurv-cfg`; it must print its egg config as JSON on stdout. See [app/kurv/src/kurv/plugins/mod.rs](app/kurv/src/kurv/plugins/mod.rs). Plugins get `KURV_API_HOST`, `KURV_API_PORT`, `KURV_HOME`, `KURV_LOGS_DIR` injected into their env. They behave like eggs but can't be removed via the CLI (stop the server and delete the file instead).
 
-Official plugins live as crates under `plugins/*` in this workspace and build on top of [`kurv-plugin-sdk`](crates/kurv-plugin-sdk/) — each plugin `main` is a one-liner delegating to `kurv_plugin_sdk::start(configure, run_loop)`. The reference implementation is [plugins/kurv-ui/src/main.rs](plugins/kurv-ui/src/main.rs). A legacy `.bat` equivalent is kept at [examples/plugins/kurv-hello-world.bat](examples/plugins/kurv-hello-world.bat) for reference.
+Official plugins live as crates under `plugins/*` in this workspace and build on top of [`kurv-plugin-sdk`](crates/kurv-plugin-sdk/) — each plugin `main` is a one-liner delegating to `kurv_plugin_sdk::start(configure, run_loop)`. The reference implementation is [plugins/kurv-ui/src/main.rs](plugins/kurv-ui/src/main.rs).
 
 ### State persistence
 
