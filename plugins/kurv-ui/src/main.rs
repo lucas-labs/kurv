@@ -1,16 +1,22 @@
 use {
-    kurv_plugin_sdk::{KurvEnv, PluginConfig, start},
+    kurv_plugin_sdk::{KurvEnv, PluginConfig, discover_env, plugin_metadata, start},
     std::{env, thread, time::Duration},
 };
 
 fn main() {
     start(
-        |exe| PluginConfig {
-            name: "kurv-ui".into(),
-            command: exe.to_string_lossy().into_owned(),
-            args: vec!["run".into()],
-            env: [("HELLO_MESSAGE".into(), "Hello from kurv-ui plugin!".into())].into(),
-            ..Default::default()
+        plugin_metadata!(),
+        |exe| {
+            let mut env = discover_env(exe).expect("kurv-ui: failed to load sidecar config");
+            env.insert("HELLO_MESSAGE".into(), "Hello from kurv-ui plugin!".into());
+
+            PluginConfig {
+                name: "kurv-ui".into(),
+                command: exe.to_string_lossy().into_owned(),
+                args: vec!["run".into()],
+                env,
+                ..Default::default()
+            }
         },
         run,
     );

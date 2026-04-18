@@ -3,10 +3,29 @@ use {
     anyhow::{Context, Result, anyhow},
     log::{debug, info, warn},
     std::{
+        collections::HashMap,
         path::{Path, PathBuf},
         process::Command,
     },
 };
+
+fn injected_plugin_env(info: &Info) -> HashMap<String, String> {
+    HashMap::from([
+        ("KURV_API_HOST".to_string(), info.api_host.clone()),
+        ("KURV_API_PORT".to_string(), info.api_port.to_string()),
+        ("KURV_HOME".to_string(), info.paths.kurv_home.display().to_string()),
+        ("KURV_LOGS_DIR".to_string(), info.paths.logs_dir.display().to_string()),
+    ])
+}
+
+fn merge_injected_plugin_env(
+    existing_env: Option<HashMap<String, String>>,
+    info: &Info,
+) -> HashMap<String, String> {
+    let mut env = existing_env.unwrap_or_default();
+    env.extend(injected_plugin_env(info));
+    env
+}
 
 /// discovers all plugins in the given directory.
 pub fn discover(info: &Info) -> Vec<(PathBuf, Egg)> {
@@ -63,22 +82,11 @@ pub fn discover(info: &Info) -> Vec<(PathBuf, Egg)> {
             }
 
             // try to get plugin configuration
-            match get_plugin_config(&path) {
+            match get_plugin_config(&path, info) {
                 Ok(mut config) => {
                     debug!("successfully loaded plugin config for {}: {:?}", filename, config.name);
 
-                    // inject env variables from host kurv environment
-                    // so that plugins can know where the kurv api is running, where logs are
-                    // stored, etc.
-                    let mut env = config.env.unwrap_or_default();
-                    env.insert("KURV_API_HOST".to_string(), info.api_host.clone());
-                    env.insert("KURV_API_PORT".to_string(), info.api_port.to_string());
-                    env.insert("KURV_HOME".to_string(), info.paths.kurv_home.display().to_string());
-                    env.insert(
-                        "KURV_LOGS_DIR".to_string(),
-                        info.paths.logs_dir.display().to_string(),
-                    );
-                    config.env = Some(env);
+                    config.env = Some(merge_injected_plugin_env(config.env.take(), info));
 
                     Some((path, config))
                 }
@@ -97,11 +105,12 @@ pub fn discover(info: &Info) -> Vec<(PathBuf, Egg)> {
 /// get plugin configuration
 ///
 /// executes a plugin with `--kurv-cfg` flag, to get its config; parses the JSON output as `Egg`.
-fn get_plugin_config(plugin_path: &Path) -> Result<Egg> {
+fn get_plugin_config(plugin_path: &Path, info: &Info) -> Result<Egg> {
     debug!("getting config for plugin: {}", plugin_path.display());
 
     let output = Command::new(plugin_path)
         .arg("--kurv-cfg")
+        .envs(injected_plugin_env(info))
         .output()
         .with_context(|| format!("failed to execute plugin: {}", plugin_path.display()))?;
 
