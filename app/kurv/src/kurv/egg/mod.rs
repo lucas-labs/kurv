@@ -308,13 +308,11 @@ impl Egg {
 
     /// checks if the egg's state has unsynced changes
     pub fn is_state_unsynced(&self) -> bool {
-        let result = if let Some(ref egg_state) = self.state {
+        if let Some(ref egg_state) = self.state {
             egg_state.uncsynced
         } else {
             false
-        };
-
-        result
+        }
     }
 
     /// marks the egg's state as synced or unsynced

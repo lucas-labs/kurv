@@ -18,6 +18,7 @@ jobs:
     outputs:
       release-note: ${{ steps.changelog.outputs.changelog }}
       version: ${{ steps.version.outputs.local-version }}
+      scope: ${{ steps.scope.outputs.scope }}
 
     steps:
       - name: 📁 » checkout repository
@@ -25,15 +26,50 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: ⬅️ » get previous git tag
+      - name: 🦀 » install stable rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 🔎 » extract scope from commit message
+        id: scope
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          scope=$(printf '%s' "$COMMIT_MSG" | head -n1 | sed -n 's/^release(\([^)]*\)):.*/\1/p')
+          if [ -z "$scope" ]; then
+            echo "::error::release commit must be of the form 'release(<scope>): ...'"
+            exit 1
+          fi
+          echo "scope=$scope" >> "$GITHUB_OUTPUT"
+
+      - name: 🗺️ » resolve scope → Cargo.toml path
+        id: meta
+        env:
+          SCOPE: ${{ steps.scope.outputs.scope }}
+        run: |
+          path=$(cargo metadata --format-version 1 --no-deps \
+            | jq -r --arg s "$SCOPE" '.packages[] | select(.name==$s) | .manifest_path')
+          if [ -z "$path" ]; then
+            echo "::error::scope '$SCOPE' is not a workspace member"
+            exit 1
+          fi
+          # convert absolute → repo-relative for the composite action
+          rel=${path#"$GITHUB_WORKSPACE/"}
+          echo "cargo_toml=./$rel" >> "$GITHUB_OUTPUT"
+
+      - name: ⬅️ » get previous git tag for scope
         id: tag
-        run: echo "last-tag=$(git describe --tags --abbrev=0 || git rev-list --max-parents=0 ${{github.ref}})" >> $GITHUB_OUTPUT
-      
+        env:
+          SCOPE: ${{ steps.scope.outputs.scope }}
+        run: |
+          last=$(git describe --tags --abbrev=0 --match "${SCOPE}-v*" 2>/dev/null \
+            || git rev-list --max-parents=0 ${{ github.ref }})
+          echo "last-tag=$last" >> "$GITHUB_OUTPUT"
+
       - name: 🏷️ » get versions
         uses: ./.github/actions/check-version
         id: version
         with:
-          cargo-toml-path: "./Cargo.toml"
+          cargo-toml-path: ${{ steps.meta.outputs.cargo_toml }}
 
       - name: 📑 » generate changelog
         uses: lucaslabstech/action-release@v1.0.4
@@ -42,8 +78,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           from: ${{ steps.tag.outputs.last-tag }}
           to: ${{ github.ref }}
-          next-version: v${{ steps.version.outputs.local-version }}
-          
+          next-version: ${{ steps.scope.outputs.scope }}-v${{ steps.version.outputs.local-version }}
+
       - name: 🗑️ » delete outdated drafts
         uses: hugo19941994/delete-draft-releases@v2.0.0
         env:
@@ -56,6 +92,6 @@ jobs:
         with:
           prerelease: false
           draft: true
-          tag_name: v${{ steps.version.outputs.local-version }}
-          name: v${{ steps.version.outputs.local-version }}
+          tag_name: ${{ steps.scope.outputs.scope }}-v${{ steps.version.outputs.local-version }}
+          name: ${{ steps.scope.outputs.scope }} v${{ steps.version.outputs.local-version }}
           body: ${{ steps.changelog.outputs.changelog }}

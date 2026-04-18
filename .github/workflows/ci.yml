@@ -22,12 +22,9 @@ jobs:
     secrets: inherit
 
   draft_release:
-    if: 
+    if:
       github.event_name == 'push' &&
-      (
-        startsWith(github.event.head_commit.message, 'release:') || 
-        startsWith(github.event.head_commit.message, 'release(')
-      )
+      startsWith(github.event.head_commit.message, 'release(')
     uses: ./.github/workflows/draft-release.yml
     secrets: inherit
         

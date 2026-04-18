@@ -1,10 +1,10 @@
-use {serde::Serialize, serde_saphyr::to_string};
+use {serde::Serialize, serde_json::to_string_pretty};
 
 pub fn str<T>(t: &T) -> String
 where
     T: Serialize,
 {
-    match to_string(t) {
+    match to_string_pretty(t) {
         Ok(s) => s,
 
         // if we couldn't serialize to string with serde

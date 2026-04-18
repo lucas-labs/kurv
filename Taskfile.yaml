@@ -4,45 +4,90 @@ version: '3'
 
 tasks:
   dev:
+    desc: 🚀 run kurv server with file watching
     cmds:
-      - cargo +stable watch -x "run server --force"
+      - cargo +stable watch -x "run -p kurv -- server --force"
 
   dev:nowatch:
+    desc: 🚀 run kurv server without file watching
     cmds:
-      - cargo +stable run server --force
+      - cargo +stable run -p kurv -- server --force
+
+  release:
+    desc: 🔖 create a per-package release commit
+    silent: true
+    cmds:
+      - python scripts/release.py
 
   build:release:
-    desc: ⚡ build kurv «release»
+    desc: 🔨 build kurv «release»
     cmds:
-      - cargo +stable build --release
+      - cargo +stable build --workspace --release
       - python check_size.py
 
   fmt:check:
+    desc: ✅ check code formatting with rustfmt
     cmds:
       - cargo +nightly fmt --all --check
 
   lint:check:
+    desc: ✅ run clippy checks
     cmds:
       - cargo +stable clippy --workspace --all-targets --all-features
 
   lint:
+    desc: 🧹 run clippy with auto-fix
     cmds:
       - cargo +stable clippy --workspace --all-targets --all-features --fix --allow-staged
 
   check:
+    desc: ✅ run all checks (fmt, lint)
     cmds:
       - task: fmt:check
       - task: lint:check
 
   fmt:
+    desc: 🧹 run rustfmt on all code
     cmds:
       - cargo +nightly fmt --all
 
   build:
-    desc: ⚡ build kurv «debug»
+    desc: 🔨 build kurv «debug»
     cmds:
-      - cargo +stable build
+      - cargo +stable build --workspace
       - python check_size.py
+
+  setup:agents:
+    desc: 🧠 prepare repo for claude agent
+    silent: true
+    cmds:
+      - rm -f .claude/CLAUDE.md
+      - rm -f AGENTS.md
+      - mkdir -p .agents .claude
+      - cmd: |
+          pwsh -Command "New-Item -ItemType SymbolicLink -Path .claude/CLAUDE.md -Target ../.agents/AGENTS.md -Force | Out-Null"
+          pwsh -Command "New-Item -ItemType SymbolicLink -Path AGENTS.md -Target .agents/AGENTS.md -Force | Out-Null"
+        platforms: [windows]
+      - cmd: |
+          ln -sfn ../.agents/AGENTS.md .claude/CLAUDE.md
+          ln -sfn ../.agents/AGENTS.md AGENTS.md
+        platforms: [linux, darwin]
+      - echo "✅ Linked .agents/AGENTS.md to .claude/CLAUDE.md and AGENTS.md"
+      - cmd: |
+          # check if .gitignore has .claude or AGENTS.md, if not add them
+          if ! grep -q "^.claude$" .gitignore; then
+            echo -e "\n.claude" >> .gitignore
+            echo "✅ Added .claude to .gitignore"
+          else
+            echo "✅ .claude is already in .gitignore"
+          fi
+          if ! grep -q "^/AGENTS.md$" .gitignore; then
+            echo -e "\n/AGENTS.md" >> .gitignore
+            echo "✅ Added AGENTS.md to .gitignore"
+          else
+            echo "✅ AGENTS.md is already in .gitignore"
+          fi
+       
 
   # the following tasks are for testing the ci workflow locally, using the
   # nektosact.com tool
@@ -67,3 +112,4 @@ tasks:
           --secret-file="./.github/act-test/secrets.env" \
           --pull=false \
           --reuse
+  

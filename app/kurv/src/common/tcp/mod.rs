@@ -51,10 +51,9 @@ pub struct Request {
 }
 
 impl Display for Request {
-    /// format as yaml
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let yaml = serde_saphyr::to_string(&self).unwrap();
-        write!(f, "{}", yaml)
+        let json = serde_json::to_string_pretty(&self).unwrap();
+        write!(f, "{}", json)
     }
 }
 

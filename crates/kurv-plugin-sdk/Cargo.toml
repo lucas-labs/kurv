@@ -1,0 +1,13 @@
+[package]
+name = "kurv-plugin-sdk"
+version = "0.0.0"
+description = "Shared types and helpers for kurv plugins."
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }

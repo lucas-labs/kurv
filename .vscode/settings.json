@@ -2,11 +2,11 @@
     "files.exclude": {
         // 😺 git
         ".git": true,
-        ".gitignore": true,
+        // ".gitignore": true,
         // ".github": true, 
         
         // 📦 packages
-        "Cargo.lock": true,
+        // "Cargo.lock": true,
 
         // 🏗️ build
         "target": true,
