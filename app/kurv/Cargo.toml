@@ -1,0 +1,32 @@
+[package]
+name = "kurv"
+version = "0.1.0"
+description = "A process manager to daemonize commands and programs. Inspired by pm2, but lightweight and not as featureful."
+categories = ["command-line-utilities"]
+keywords = ["cli", "process", "manager", "daemon", "daemonize"]
+readme = "../../README.md"
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+anyhow = "1.0.100"
+chrono = { version = "0.4.42", features = ["serde"] }
+cli-table = "0.5.0"
+command-group = "5.0.1"
+crossterm = "0.29.0"
+form_urlencoded = "1.2.2"
+htmlparser = "0.2.1"
+indoc = "2.0.7"
+log = "0.4.28"
+pico-args = "0.5.0"
+regex-lite = "0.1.8"
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde-saphyr = { version = "0.0.23", default-features = false, features = ["deserialize"] }
+velcro = "0.5.4"
+
+[dev-dependencies]
+tempfile = "3.8"

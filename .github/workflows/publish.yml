@@ -13,24 +13,81 @@ defaults:
     shell: 'bash'
 
 jobs:
+  prepare:
+    name: 🗺️ » prepare
+    runs-on: ubuntu-latest
+    outputs:
+      scope: ${{ steps.tag.outputs.scope }}
+      version: ${{ steps.tag.outputs.version }}
+      crate_dir: ${{ steps.meta.outputs.crate_dir }}
+      manifest_path: ${{ steps.meta.outputs.manifest_path }}
+      crates_io: ${{ steps.release.outputs.crates_io }}
+      matrix: ${{ steps.release.outputs.matrix }}
+      artifact_prefix: ${{ steps.tag.outputs.scope }}
+    steps:
+      - name: 📁 » checkout repository
+        uses: actions/checkout@v6
+
+      - name: 🦀 » install stable rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 🏷️ » parse scope + version from release tag
+        id: tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          # tag format: <scope>-v<version>, e.g. kurv-v0.2.0
+          if [[ ! "$TAG" =~ ^(.+)-v([0-9]+\.[0-9]+\.[0-9]+.*)$ ]]; then
+            echo "::error::tag '$TAG' is not in <scope>-v<version> form"
+            exit 1
+          fi
+          echo "scope=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          echo "version=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+
+      - name: 🗺️ » resolve scope → manifest path
+        id: meta
+        env:
+          SCOPE: ${{ steps.tag.outputs.scope }}
+        run: |
+          path=$(cargo metadata --format-version 1 --no-deps \
+            | jq -r --arg s "$SCOPE" '.packages[] | select(.name==$s) | .manifest_path')
+          if [ -z "$path" ]; then
+            echo "::error::scope '$SCOPE' is not a workspace member"
+            exit 1
+          fi
+          rel=${path#"$GITHUB_WORKSPACE/"}
+          crate_dir=$(dirname "$rel")
+          echo "manifest_path=$rel" >> "$GITHUB_OUTPUT"
+          echo "crate_dir=$crate_dir" >> "$GITHUB_OUTPUT"
+
+      - name: 📋 » load per-scope release manifest
+        id: release
+        env:
+          SCOPE: ${{ steps.tag.outputs.scope }}
+          CRATE_DIR: ${{ steps.meta.outputs.crate_dir }}
+        run: |
+          f="$CRATE_DIR/.release.yml"
+          if [ ! -f "$f" ]; then
+            echo "::error::missing $f — every releasable crate needs a .release.yml"
+            exit 1
+          fi
+
+          crates_io=$(yq -r '.crates_io // false' "$f")
+          echo "crates_io=$crates_io" >> "$GITHUB_OUTPUT"
+
+          # expand {scope} in archive names, emit matrix as compact JSON
+          matrix=$(yq -o=json '.targets' "$f" \
+            | jq -c --arg s "$SCOPE" '[.[] | .archive |= (gsub("\\{scope\\}"; $s))]')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
   build:
     name: 🏗️ » build
+    needs: prepare
     runs-on: ${{ matrix.platform.os }}
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - os_name: linux-x86_64
-            os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            bin: kurv
-            archive: kurv-linux-x86_64.tar.gz
-
-          - os_name: windows-x86_64
-            os: windows-latest
-            target: x86_64-pc-windows-msvc
-            bin: kurv.exe
-            archive: kurv-windows-x86_64.zip
+        platform: ${{ fromJson(needs.prepare.outputs.matrix) }}
     steps:
       - name: 📁 » checkout repository
         uses: actions/checkout@v6
@@ -40,16 +97,15 @@ jobs:
       - name: 🗃️ » cache cargo
         uses: Swatinem/rust-cache@v2
 
-      - name: 🏗️ » build kurv
+      - name: 🏗️ » build ${{ needs.prepare.outputs.scope }}
         uses: houseabsolute/actions-rust-cross@v1
         with:
           command: "build"
           target: ${{ matrix.platform.target }}
-          args: "--release"
+          args: "--release -p ${{ needs.prepare.outputs.scope }}"
           strip: true
 
-      - name: 📦 » archive kurv release
-        shell: bash
+      - name: 📦 » archive release
         run: |
           cd target/${{ matrix.platform.target }}/release
 
@@ -63,13 +119,12 @@ jobs:
       - name: 📤 » upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: kurv-${{ matrix.platform.os_name }}
+          name: ${{ needs.prepare.outputs.artifact_prefix }}-${{ matrix.platform.os_name }}
           path: ${{ matrix.platform.archive }}
 
-          
   publish-gh-release:
     name: 🚀 » publish github release
-    needs: build
+    needs: [prepare, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -77,7 +132,7 @@ jobs:
       - name: 📥 » download artifacts
         uses: actions/download-artifact@v7
         with:
-          pattern: kurv-*
+          pattern: ${{ needs.prepare.outputs.artifact_prefix }}-*
           merge-multiple: true
 
       - name: 📁 » list files
@@ -88,11 +143,12 @@ jobs:
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
-            kurv-*
+            ${{ needs.prepare.outputs.artifact_prefix }}-*
 
   publish-crates-io:
-    name: 🚀 » publish crates.io 
-    needs: build
+    name: 🚀 » publish crates.io
+    needs: [prepare, build]
+    if: needs.prepare.outputs.crates_io == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: 📁 » checkout repository
@@ -106,4 +162,5 @@ jobs:
       - name: 🚀 » publish
         uses: katyo/publish-crates@v2
         with:
+          path: ${{ needs.prepare.outputs.crate_dir }}
           registry-token: ${{ secrets.CRATES_TOKEN }}

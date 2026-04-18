@@ -3,6 +3,53 @@
 version: '3'
 
 tasks:
+  dev:
+    cmds:
+      - cargo +stable watch -x "run -p kurv -- server --force"
+
+  dev:nowatch:
+    cmds:
+      - cargo +stable run -p kurv -- server --force
+
+  release:
+    desc: 🔖 create a per-package release commit
+    silent: true
+    cmds:
+      - python scripts/release.py
+
+  build:release:
+    desc: ⚡ build kurv «release»
+    cmds:
+      - cargo +stable build --workspace --release
+      - python check_size.py
+
+  fmt:check:
+    cmds:
+      - cargo +nightly fmt --all --check
+
+  lint:check:
+    cmds:
+      - cargo +stable clippy --workspace --all-targets --all-features
+
+  lint:
+    cmds:
+      - cargo +stable clippy --workspace --all-targets --all-features --fix --allow-staged
+
+  check:
+    cmds:
+      - task: fmt:check
+      - task: lint:check
+
+  fmt:
+    cmds:
+      - cargo +nightly fmt --all
+
+  build:
+    desc: ⚡ build kurv «debug»
+    cmds:
+      - cargo +stable build --workspace
+      - python check_size.py
+
   setup:agents:
     desc: prepare repo for claude agent
     silent: true
@@ -33,47 +80,7 @@ tasks:
           else
             echo "✅ AGENTS.md is already in .gitignore"
           fi
-          
-  dev:
-    cmds:
-      - cargo +stable watch -x "run server --force"
-
-  dev:nowatch:
-    cmds:
-      - cargo +stable run server --force
-
-  build:release:
-    desc: ⚡ build kurv «release»
-    cmds:
-      - cargo +stable build --release
-      - python check_size.py
-
-  fmt:check:
-    cmds:
-      - cargo +nightly fmt --all --check
-
-  lint:check:
-    cmds:
-      - cargo +stable clippy --workspace --all-targets --all-features
-
-  lint:
-    cmds:
-      - cargo +stable clippy --workspace --all-targets --all-features --fix --allow-staged
-
-  check:
-    cmds:
-      - task: fmt:check
-      - task: lint:check
-
-  fmt:
-    cmds:
-      - cargo +nightly fmt --all
-
-  build:
-    desc: ⚡ build kurv «debug»
-    cmds:
-      - cargo +stable build
-      - python check_size.py
+       
 
   # the following tasks are for testing the ci workflow locally, using the
   # nektosact.com tool
@@ -98,3 +105,4 @@ tasks:
           --secret-file="./.github/act-test/secrets.env" \
           --pull=false \
           --reuse
+  

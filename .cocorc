@@ -1,4 +1,4 @@
-# https://github.com/lucas-labs/coco config
+# config for coco cli (conventional commits) - ref: https://github.com/lucas-labs/coco
 
 askScope: false
 useEmoji: true
