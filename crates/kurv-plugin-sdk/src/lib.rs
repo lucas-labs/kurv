@@ -90,11 +90,11 @@ struct SidecarConfig {
 pub fn discover_env(exe: &Path) -> io::Result<BTreeMap<String, String>> {
     let config_path = sidecar_config_path(exe);
 
-    if !config_path.exists() {
-        return Ok(BTreeMap::new());
-    }
-
-    let content = fs::read_to_string(&config_path)?;
+    let content = match fs::read_to_string(&config_path) {
+        Ok(content) => content,
+        Err(err) if err.kind() == io::ErrorKind::NotFound => return Ok(BTreeMap::new()),
+        Err(err) => return Err(err),
+    };
     let config = serde_json::from_str::<SidecarConfig>(&content).map_err(|err| {
         io::Error::new(
             io::ErrorKind::InvalidData,
