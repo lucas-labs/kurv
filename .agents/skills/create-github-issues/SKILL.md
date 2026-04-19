@@ -1,6 +1,6 @@
 ---
 name: create-github-issues
-description: 'Create GitHub issues following repository conventions. Use when drafting, planning, or creating issues, or sub-issues.'
+description: 'Create GitHub issues. Use when you need to create issues. DO NOT USE when working on issue implementation.'
 argument-hint: 'What issue should be created or drafted?'
 user-invocable: true
 disable-model-invocation: false

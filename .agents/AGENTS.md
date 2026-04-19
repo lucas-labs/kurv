@@ -25,7 +25,9 @@ The project uses [Taskfile](https://taskfile.dev) (`task ...`). Core workflows:
 - `task release` — runs `python scripts/release.py` (see [Release flow](#release-flow))
 - `task local-ci-release` / `task local-ci-pub` — run CI workflows locally via [nektosact](https://nektosact.com)
 
-**Tests:** plain cargo. Single test: `cargo test -p kurv --test unit_tests <filter>`. Integration test entry [app/kurv/tests/unit_tests.rs](app/kurv/tests/unit_tests.rs) → [app/kurv/tests/unit/](app/kurv/tests/unit/). [app/kurv/tests/integration/](app/kurv/tests/integration/) exists but is empty.
+**Tests:** plain cargo. Single test: `cargo test -p kurv --test unit_tests <filter>`. 
+
+Note: Do not add inline `#[cfg(test)]` modules in source files; keep tests in crate-local `tests/` folders so business logic files stay focused.
 
 **Running the server manually:** set `KURV_SERVER=true` or pass `--force`, otherwise the binary refuses to start as a server (safety measure — same binary is also the client).
 
