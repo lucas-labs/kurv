@@ -9,7 +9,8 @@
 			// allows to run kurv command in terminal for development purposes
 			"PATH": "${workspaceFolder}/target/debug;${env:PATH}",
 			"KURV_SERVER": "true",
-			"KURV_HOME": "${workspaceFolder}"
+			"KURV_HOME": "${workspaceFolder}",
+			"KURV_PLUGINS_HOME": "${workspaceFolder}\\target\\debug"
 		},
 		"lucodear-icons.files.associations": {
 			"*.task_logs/stdout": "log",
