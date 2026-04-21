@@ -117,7 +117,7 @@ jobs:
           cd -
 
       - name: 📤 » upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ needs.prepare.outputs.artifact_prefix }}-${{ matrix.platform.os_name }}
           path: ${{ matrix.platform.archive }}
@@ -130,7 +130,7 @@ jobs:
       contents: write
     steps:
       - name: 📥 » download artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: ${{ needs.prepare.outputs.artifact_prefix }}-*
           merge-multiple: true
