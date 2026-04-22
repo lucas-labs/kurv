@@ -14,6 +14,7 @@ use {
         db::models::get_db,
     },
     axum::{Router, extract::FromRef},
+    axum_extra::extract::cookie::SameSite,
     eyre::{Result, eyre},
     kurv_plugin_sdk::KurvEnv,
     log::info,
@@ -30,12 +31,20 @@ use {
 pub struct JwtConfig {
     pub secret: String,
     pub token_expiration: i64, // in seconds
-    pub token_schema: String,
+}
+
+#[derive(Clone)]
+pub struct CookieConfig {
+    pub name: String,
+    pub secure: bool,
+    pub same_site: SameSite,
+    pub max_age: i64,
 }
 
 #[derive(Clone)]
 pub struct SecurityConfig {
     pub jwt: JwtConfig,
+    pub cookie: CookieConfig,
 }
 
 #[derive(Clone)]
@@ -67,7 +76,9 @@ pub struct KurvUIEnv {
     pub db_url: String,
     pub security_jwt_secret: String,
     pub security_jwt_expiration: i64,
-    pub security_jwt_schema: String,
+    pub security_cookie_name: String,
+    pub security_cookie_secure: bool,
+    pub security_cookie_same_site: SameSite,
 }
 
 pub struct KurvUi {
@@ -105,7 +116,12 @@ impl KurvUi {
                     jwt: JwtConfig {
                         secret: self.kurv_ui_env.security_jwt_secret.clone(),
                         token_expiration: self.kurv_ui_env.security_jwt_expiration,
-                        token_schema: self.kurv_ui_env.security_jwt_schema.clone(),
+                    },
+                    cookie: CookieConfig {
+                        name: self.kurv_ui_env.security_cookie_name.clone(),
+                        secure: self.kurv_ui_env.security_cookie_secure,
+                        same_site: self.kurv_ui_env.security_cookie_same_site,
+                        max_age: self.kurv_ui_env.security_jwt_expiration,
                     },
                 },
                 server: ServerConfig {

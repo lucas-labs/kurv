@@ -9,10 +9,12 @@ use {
             extractor::json::Json,
         },
     },
-    axum::{Router, extract::State, routing},
+    axum::{Router, extract::State, http::StatusCode, routing},
+    axum_extra::extract::cookie::{Cookie, CookieJar},
     chrono::{Duration, Utc},
     jsonwebtoken::EncodingKey,
     serde::Deserialize,
+    time::Duration as CookieDuration,
 };
 
 #[derive(Deserialize)]
@@ -24,6 +26,7 @@ pub struct LoginRequest {
 pub fn router() -> Router<KurvAppContext> {
     Router::new()
         .route("/login", routing::post(post::login))
+    .route("/logout", routing::post(post::logout))
         .route("/me", routing::get(get::get_current))
 }
 
@@ -40,24 +43,40 @@ pub mod get {
 pub mod post {
     use super::*;
 
-    #[derive(serde::Serialize)]
-    #[serde(rename_all = "camelCase")]
-    pub struct LoginResponse {
-        pub access_token: String,
-        pub schema: String,
+    fn build_auth_cookie(context: &KurvAppContext, token: String) -> Cookie<'static> {
+        let mut cookie = Cookie::new(context.config.security.cookie.name.clone(), token);
+        cookie.set_http_only(true);
+        cookie.set_max_age(CookieDuration::seconds(context.config.security.cookie.max_age));
+        cookie.set_path("/");
+        cookie.set_same_site(context.config.security.cookie.same_site);
+        cookie.set_secure(context.config.security.cookie.secure);
+        cookie
+    }
+
+    fn build_expired_auth_cookie(context: &KurvAppContext) -> Cookie<'static> {
+        let mut cookie = Cookie::new(context.config.security.cookie.name.clone(), String::new());
+        cookie.set_http_only(true);
+        cookie.set_max_age(CookieDuration::seconds(0));
+        cookie.set_path("/");
+        cookie.set_same_site(context.config.security.cookie.same_site);
+        cookie.set_secure(context.config.security.cookie.secure);
+        cookie
     }
 
     /// Login Endpoint
     #[axum::debug_handler(state=KurvAppContext)]
     pub async fn login(
         State(context): State<KurvAppContext>,
+        jar: CookieJar,
         users_service: UsersService,
         Json(payload): Json<LoginRequest>,
-    ) -> Result<Json<LoginResponse>, AppErr> {
+    ) -> Result<(CookieJar, Json<AuthedUser>), AppErr> {
         // validate the username and password
         let user = users_service.verify(&payload.username, &payload.password).await?;
 
         if let Some(user) = user {
+            let username = user.username;
+
             // if the password is correct, we create a JWT token
             let now = Utc::now();
 
@@ -71,7 +90,7 @@ pub mod post {
                         err::internal_error("Failed to calculate token expiration time")
                     })?
                     .timestamp() as u64,
-                sub: user.username,
+                sub: username.clone(),
             };
 
             let token = jsonwebtoken::encode(
@@ -81,12 +100,24 @@ pub mod post {
             )
             .map_err(err::internal_error)?;
 
-            Ok(Json(LoginResponse {
-                access_token: token,
-                schema: context.config.security.jwt.token_schema,
-            }))
+            Ok((
+                jar.add(build_auth_cookie(&context, token)),
+                Json(AuthedUser { username }),
+            ))
         } else {
             Err(err::unauthorized("Invalid username or password"))
         }
+    }
+
+    /// Logout Endpoint
+    #[axum::debug_handler(state=KurvAppContext)]
+    pub async fn logout(
+        State(context): State<KurvAppContext>,
+        jar: CookieJar,
+    ) -> Result<(CookieJar, StatusCode), AppErr> {
+        Ok((
+            jar.add(build_expired_auth_cookie(&context)),
+            StatusCode::NO_CONTENT,
+        ))
     }
 }

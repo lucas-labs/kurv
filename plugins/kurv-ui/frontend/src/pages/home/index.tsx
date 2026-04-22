@@ -1,3 +1,4 @@
+import { HTTPError } from 'ky';
 import { Pause, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
@@ -82,9 +83,12 @@ export function HomePage() {
                 setError(null);
             });
         } catch (err) {
-            console.error('Failed to fetch eggs:', err);
             if (!silent) {
-                setError(err instanceof Error ? err.message : 'Failed to fetch eggs.');
+                console.error('Failed to fetch eggs:', err);
+            }
+
+            if (!silent) {
+                setError(getKurvRequestErrorMessage(err, 'Failed to fetch eggs.'));
             }
         } finally {
             if (!silent) {
@@ -102,7 +106,7 @@ export function HomePage() {
             await fetchEggs(kind);
         } catch (err) {
             console.error(`Failed to ${action} egg:`, err);
-            toast.error(err instanceof Error ? err.message : `Failed to ${action} egg.`);
+            toast.error(getKurvRequestErrorMessage(err, `Failed to ${action} egg.`));
         } finally {
             setPendingAction(null);
         }
@@ -273,4 +277,12 @@ function ListMessage({ label, tone = 'default' }: { label: string; tone?: 'defau
 
 function formatPid(pid: number) {
     return pid > 0 ? pid : '-';
+}
+
+function getKurvRequestErrorMessage(error: unknown, fallback: string) {
+    if (error instanceof HTTPError && error.response.status === 502) {
+        return 'Unable to reach the kurv server. Make sure it is running and try again.';
+    }
+
+    return error instanceof Error ? error.message : fallback;
 }

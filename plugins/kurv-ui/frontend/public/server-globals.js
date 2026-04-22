@@ -1,4 +1,4 @@
 window.__SERVER__ = {
-    BASE_URL: 'localhost:9500/api',
+    BASE_URL: '/api',
     VERSION: '0.0.0',
 };

@@ -1,3 +1,4 @@
+import { HTTPError } from 'ky';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { Link, Navigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -45,7 +46,7 @@ export function EggDetailPage() {
             });
         } catch (err) {
             console.error('Failed to fetch egg detail:', err);
-            setError(err instanceof Error ? err.message : 'Failed to fetch egg detail.');
+            setError(getKurvRequestErrorMessage(err, 'Failed to fetch egg detail.'));
         } finally {
             setIsLoading(false);
         }
@@ -64,7 +65,7 @@ export function EggDetailPage() {
             toast.success(`Egg ${action} request sent.`);
         } catch (err) {
             console.error(`Failed to ${action} egg:`, err);
-            toast.error(err instanceof Error ? err.message : `Failed to ${action} egg.`);
+            toast.error(getKurvRequestErrorMessage(err, `Failed to ${action} egg.`));
         } finally {
             setPendingAction(null);
         }
@@ -169,6 +170,14 @@ export function EggDetailPage() {
             </div>
         </div>
     );
+}
+
+function getKurvRequestErrorMessage(error: unknown, fallback: string) {
+    if (error instanceof HTTPError && error.response.status === 502) {
+        return 'Unable to reach the kurv server. Make sure it is running and try again.';
+    }
+
+    return error instanceof Error ? error.message : fallback;
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {

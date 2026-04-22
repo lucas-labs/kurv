@@ -50,9 +50,9 @@ pub enum AuthError {
     #[error("Missing algorithm")]
     MissingAlgorithm,
 
-    /// When the request is missing a token or the token is invalid
-    #[error("Missing or invalid token")]
-    MissingToken,
+    /// When the request is missing the configured authentication cookie.
+    #[error("Missing or invalid auth cookie")]
+    MissingCookie(String),
 
     /// When an internal error occurs that doesn't fit into the other categories.
     /// This is a catch-all error for any unexpected errors that occur such as
@@ -96,7 +96,9 @@ impl IntoResponse for AuthError {
             AuthError::ImmatureSignature => err(StatusCode::UNAUTHORIZED, "Immature signature"),
             AuthError::InvalidAlgorithm => err(StatusCode::UNAUTHORIZED, "Invalid algorithm"),
             AuthError::MissingAlgorithm => err(StatusCode::UNAUTHORIZED, "Missing algorithm"),
-            AuthError::MissingToken => err(StatusCode::UNAUTHORIZED, "Missing or invalid token"),
+            AuthError::MissingCookie(_) => {
+                err(StatusCode::UNAUTHORIZED, "Missing or invalid auth cookie")
+            }
             AuthError::InternalError => err(StatusCode::INTERNAL_SERVER_ERROR, "Internal error"),
         };
 

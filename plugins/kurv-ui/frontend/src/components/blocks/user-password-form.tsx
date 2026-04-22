@@ -5,6 +5,7 @@ import { LabeledInput } from './labeled-input';
 export type UserPasswordFormProps = Omit<ComponentProps<'form'>, 'onSubmit'> & {
     onSubmit?: (username: string, password: string) => void | Promise<void>;
     isLoading?: boolean;
+    errorMessage?: string | null;
     title?: string;
     description?: string;
     buttonText?: string;
@@ -16,6 +17,7 @@ const UserPasswordForm = ({
     title,
     description,
     isLoading = false,
+    errorMessage,
     buttonText = 'Ingresar',
     buttonLoadingText = 'Ingresando...',
     onSubmit,
@@ -75,6 +77,12 @@ const UserPasswordForm = ({
                 >
                     {isLoading ? buttonLoadingText : buttonText}
                 </Button>
+
+                {errorMessage && (
+                    <p role="alert" className="text-destructive text-center text-sm">
+                        {errorMessage}
+                    </p>
+                )}
             </div>
         </form>
     );

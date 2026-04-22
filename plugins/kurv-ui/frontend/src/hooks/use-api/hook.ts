@@ -1,9 +1,10 @@
+import ky from 'ky';
 import { aget, apost, get, post } from 'kypi';
 import { createClientHook } from 'kypi/react';
-import { use, useCallback } from 'react';
+import { use } from 'react';
 import { Globals } from '@/contexts/globals/context';
-import { useAuth } from '../use-auth';
 import type {
+    CurrentUserResponse,
     KurvEgg,
     KurvEggSummaryList,
     ListEggsQuery,
@@ -17,6 +18,8 @@ import type {
 const useClient = createClientHook({
     auth: {
         login: post<LoginRequest, LoginResponse>('/auth/login'),
+        logout: post<void, void>('/auth/logout'),
+        me: get<void, CurrentUserResponse>('/auth/me'),
     },
     admin: {
         setup: {
@@ -37,10 +40,26 @@ const useClient = createClientHook({
     },
 });
 
+const cookieAwareKy = ky.create({
+    credentials: 'include',
+});
+
 type ParlaApiClient = ReturnType<typeof useClient>;
 
 type ParlaApiConfig = {
     baseUrl: string;
+};
+
+const resolveBaseUrl = (baseUrl: string) => {
+    if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
+        return baseUrl;
+    }
+
+    if (baseUrl.startsWith('/')) {
+        return baseUrl;
+    }
+
+    return `http://${baseUrl}`;
 };
 
 export function useApi(): ParlaApiClient;
@@ -54,15 +73,13 @@ export function useApi<T>(
     firstArg?: ((api: ParlaApiClient) => T) | ParlaApiConfig,
     secondArg?: ParlaApiConfig,
 ): ParlaApiClient | T {
-    const { token } = useAuth();
     const { server } = use(Globals);
     const selector = typeof firstArg === 'function' ? firstArg : undefined;
     const config = typeof firstArg === 'object' ? firstArg : secondArg;
-    const getToken = useCallback(() => token, [token]);
 
     const api = useClient({
-        baseUrl: config?.baseUrl || `http://${server.baseUrl}`,
-        getToken,
+        baseUrl: resolveBaseUrl(config?.baseUrl || server.baseUrl),
+        kyInstance: cookieAwareKy,
     });
 
     if (selector) {

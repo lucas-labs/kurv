@@ -1,47 +1,75 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import { HTTPError } from 'ky';
+import { type ReactNode, useEffect, useEffectEvent, useState } from 'react';
+import { useApi } from '@/hooks/use-api/hook';
+import type { AuthenticatedUser } from '@/hooks/use-api/types';
 import { AuthContext, type AuthContextType } from './context';
 
-const TOKEN_STORAGE_KEY = 'parla_auth_token';
+const isUnauthorized = (error: unknown) => {
+    return error instanceof HTTPError && error.response.status === 401;
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setToken] = useState<string | null>(() => {
-        // Initialize from localStorage if available
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem(TOKEN_STORAGE_KEY);
+    const api = useApi((client) => client.auth);
+    const [user, setUser] = useState<AuthenticatedUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const loadCurrentUser = useEffectEvent(async () => {
+        try {
+            return await api.me().json();
+        } catch (error) {
+            if (isUnauthorized(error)) {
+                return null;
+            }
+
+            throw error;
         }
-        return null;
     });
 
-    const login = (newToken: string) => {
-        setToken(newToken);
-        localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
+    const refresh = useEffectEvent(async () => {
+        setIsLoading(true);
+
+        try {
+            setUser(await loadCurrentUser());
+        } finally {
+            setIsLoading(false);
+        }
+    });
+
+    const login = async (username: string, password: string) => {
+        await api.login({ username, password }).json();
+        setUser(await loadCurrentUser());
     };
 
-    const logout = () => {
-        setToken(null);
-        localStorage.removeItem(TOKEN_STORAGE_KEY);
+    const logout = async () => {
+        try {
+            await api.logout();
+            setUser(null);
+        } catch (error) {
+            if (isUnauthorized(error)) {
+                setUser(null);
+                return;
+            }
+
+            throw error;
+        }
     };
 
-    const isAuthenticated = Boolean(token);
+    const isAuthenticated = Boolean(user);
 
     useEffect(() => {
-        // Sync with localStorage changes from other tabs
-        const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === TOKEN_STORAGE_KEY) {
-                setToken(e.newValue);
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        void refresh().catch((error) => {
+            console.error('Error restoring auth session:', error);
+        });
     }, []);
 
     const value: AuthContextType = {
-        token,
+        user,
         login,
         logout,
-        sub: token ? JSON.parse(atob(token.split('.')[1])).sub : null,
+        refresh,
+        sub: user?.username || null,
         isAuthenticated,
+        isLoading,
     };
 
     return <AuthContext value={value}>{children}</AuthContext>;

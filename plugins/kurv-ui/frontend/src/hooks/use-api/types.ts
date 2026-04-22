@@ -17,10 +17,12 @@ export interface LoginRequest {
     password: string;
 }
 
-export interface LoginResponse {
-    accessToken: string;
-    schema: string;
+export interface AuthenticatedUser {
+    username: string;
 }
+
+export type LoginResponse = AuthenticatedUser;
+export type CurrentUserResponse = AuthenticatedUser;
 
 // Admin: Setup API types
 
