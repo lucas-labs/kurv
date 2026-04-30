@@ -26,7 +26,7 @@ pub struct LoginRequest {
 pub fn router() -> Router<KurvAppContext> {
     Router::new()
         .route("/login", routing::post(post::login))
-    .route("/logout", routing::post(post::logout))
+        .route("/logout", routing::post(post::logout))
         .route("/me", routing::get(get::get_current))
 }
 
@@ -100,10 +100,7 @@ pub mod post {
             )
             .map_err(err::internal_error)?;
 
-            Ok((
-                jar.add(build_auth_cookie(&context, token)),
-                Json(AuthedUser { username }),
-            ))
+            Ok((jar.add(build_auth_cookie(&context, token)), Json(AuthedUser { username })))
         } else {
             Err(err::unauthorized("Invalid username or password"))
         }
@@ -115,9 +112,6 @@ pub mod post {
         State(context): State<KurvAppContext>,
         jar: CookieJar,
     ) -> Result<(CookieJar, StatusCode), AppErr> {
-        Ok((
-            jar.add(build_expired_auth_cookie(&context)),
-            StatusCode::NO_CONTENT,
-        ))
+        Ok((jar.add(build_expired_auth_cookie(&context)), StatusCode::NO_CONTENT))
     }
 }
