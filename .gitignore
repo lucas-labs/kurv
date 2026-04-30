@@ -3,6 +3,8 @@
 # will have compiled files and executables
 debug/
 target/
+dist/
+node_modules/
 
 # Make sure we never commit a .exe file
 *.exe
@@ -40,3 +42,9 @@ task_logs/
 .github/act-test
 .claude
 /AGENTS.md
+
+### Database ###
+*.db
+*.sqlite
+*.*-shm
+*.*-wal

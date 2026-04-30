@@ -1,4 +1,7 @@
 # config for coco cli (conventional commits) - ref: https://github.com/lucas-labs/coco
 
-askScope: false
 useEmoji: true
+scopes:
+  - kurv
+  - kurv-ui
+  - ""
