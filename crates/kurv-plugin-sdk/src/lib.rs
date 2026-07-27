@@ -26,14 +26,44 @@
 //!     );
 //! }
 //! ```
+//!
+//! async plugins can use [`start_async`] instead:
+//!
+//! ```no_run
+//! use kurv_plugin_sdk::{KurvEnv, PluginConfig, discover_env, plugin_metadata, start_async};
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     start_async(
+//!         plugin_metadata!(),
+//!         |exe| {
+//!             let mut env = discover_env(exe).expect("kurv plugin: failed to load sidecar config");
+//!             env.insert("MY_PLUGIN_MODE".into(), "dev".into());
+//!
+//!             PluginConfig {
+//!                 name: "my-plugin".into(),
+//!                 command: exe.to_string_lossy().into_owned(),
+//!                 args: vec!["run".into()],
+//!                 env,
+//!                 ..Default::default()
+//!             }
+//!         },
+//!         |_env: KurvEnv| async move {
+//!             // async plugin loop
+//!         },
+//!     );
+//! }
+//! ```
 
 use {
     serde::{Deserialize, Serialize},
     std::{
         collections::BTreeMap,
-        env, fmt, fs, io,
+        env, fmt, fs,
+        future::Future,
+        io,
         path::{Path, PathBuf},
-        process,
+        process, thread,
     },
 };
 
@@ -113,6 +143,7 @@ fn sidecar_config_path(exe: &Path) -> PathBuf {
 
 /// environment variables kurv injects into every plugin process at spawn time.
 /// parsed once at `run` dispatch so plugins don't each re-parse them.
+#[derive(Clone)]
 pub struct KurvEnv {
     pub api_host: String,
     pub api_port: u16,
@@ -141,6 +172,29 @@ where
     C: FnOnce(&Path) -> PluginConfig,
     R: FnOnce(KurvEnv),
 {
+    start_with(metadata, configure, move |env| {
+        run_loop(env);
+    })
+}
+
+/// async plugin entrypoint. identical to [`start`] except the `run` command
+/// drives the returned future on a Tokio runtime.
+pub fn start_async<C, R, F>(metadata: PluginMetadata, configure: C, run_loop: R) -> !
+where
+    C: FnOnce(&Path) -> PluginConfig,
+    R: FnOnce(KurvEnv) -> F,
+    F: Future<Output = ()> + Send + 'static,
+{
+    start_with(metadata, configure, move |env| {
+        run_plugin_loop(run_loop(env));
+    })
+}
+
+fn start_with<C, R>(metadata: PluginMetadata, configure: C, run_loop: R) -> !
+where
+    C: FnOnce(&Path) -> PluginConfig,
+    R: FnOnce(KurvEnv),
+{
     let arg = env::args().nth(1);
 
     match arg.as_deref() {
@@ -163,6 +217,24 @@ where
             process::exit(1);
         }
     }
+}
+
+fn run_plugin_loop<F>(future: F)
+where
+    F: Future<Output = ()> + Send + 'static,
+{
+    if let Ok(handle) = tokio::runtime::Handle::try_current() {
+        thread::spawn(move || handle.block_on(future))
+            .join()
+            .expect("kurv plugin: async run loop thread panicked");
+        return;
+    }
+
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("kurv plugin: failed to create tokio runtime")
+        .block_on(future);
 }
 
 fn program_name() -> String {

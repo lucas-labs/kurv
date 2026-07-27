@@ -10,4 +10,37 @@ homepage.workspace = true
 publish = false
 
 [dependencies]
+argon2 = { version = "0.5.3", features = ["rand"]}
+rand_core = {version = "0.6.4", features = ["std", "getrandom"]}
+axum = {version="0.8.9", features = ["json", "macros", "multipart", "ws"]}
+axum-extra = { version = "0.12.6", features = ["cookie", "typed-header"] }
+chrono = { version = "0.4.44", default-features = false, features = ["clock", "std", "serde"] }
+colog ={ version =  "1.4.0" }
+eyre = { version = "0.6.12" }
+jsonwebtoken = { version = "10.3.0", default-features = false, features = ["rust_crypto"] }
 kurv-plugin-sdk = { workspace = true }
+log = { version="0.4.29" }
+rust-embed = { version = "8.11.0" }
+sea-orm = { version = "1.1", features = ["macros", "runtime-tokio-rustls", "sqlx-sqlite"] }
+sea-orm-migration = { version = "1.1" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { version = "2.0.18" }
+time = { version = "0.3" }
+tokio = { workspace = true }
+tower = { version = "0.5.3" }
+tower-http = { version = "0.6.8", features=["cors", "set-header"] }
+
+[profile.dev]
+incremental = true
+
+[profile.release]
+opt-level = "z"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+strip = "symbols"
+lto = "fat"
+rpath = false
+debug = 0
+debug-assertions = false

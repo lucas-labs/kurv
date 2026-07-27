@@ -2,11 +2,12 @@
     "files.exclude": {
         // 😺 git
         ".git": true,
-        // ".gitignore": true,
-        // ".github": true, 
-        
+        ".gitignore": true,
+        ".github": true,
+
         // 📦 packages
-        // "Cargo.lock": true,
+        "Cargo.lock": true,
+        "scripts": true,
 
         // 🏗️ build
         "target": true,
@@ -19,10 +20,29 @@
         ".vscode": true,
         "*.code-workspace": true,
 
+        // 🔧 config
+        "renovate.json": true,
+        ".cocorc": true,
+        "**/.prettierrc": true,
+        "**/.prettierignore": true,
+        "**/eslint.config.js": true,
+        "**/tsconfig*.json": true,
+
+        // 🧠 agents
+        ".agents": true,
+        ".claude": true,
+        "AGENTS.md": true,
+
         // 🗑️ trash
         ".task": true,
+        ".bruno": true,
+        ".kurv": true,
+        "**/bun.lock": true
+
+        // 📜 logs
+        // "task_logs": true
     },
-    "[rust]": {
+    "[rust][typescriptreact][typescript][html][css][tailwindcss][javascript][json][jsonc]": {
         "editor.formatOnSave": true
     }
 }

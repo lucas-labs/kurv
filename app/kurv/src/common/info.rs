@@ -107,7 +107,10 @@ impl Info {
         let kurv_file = kurv_home.join(".kurv");
 
         // the path to the plugins directory inside the kurv home directory
-        let plugins_dir = kurv_home.join("plugins");
+        let plugins_dir = match std::env::var("KURV_PLUGINS_HOME") {
+            Ok(dir) => PathBuf::from(dir),
+            Err(_) => kurv_home.join("plugins"),
+        };
 
         Ok(Paths {
             executable,
