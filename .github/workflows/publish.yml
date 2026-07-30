@@ -26,7 +26,7 @@ jobs:
       artifact_prefix: ${{ steps.tag.outputs.scope }}
     steps:
       - name: 📁 » checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: 🦀 » install stable rust
         uses: dtolnay/rust-toolchain@stable
@@ -90,7 +90,7 @@ jobs:
         platform: ${{ fromJson(needs.prepare.outputs.matrix) }}
     steps:
       - name: 📁 » checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -152,7 +152,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📁 » checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
