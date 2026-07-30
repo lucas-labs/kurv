@@ -81,7 +81,7 @@ jobs:
           next-version: ${{ steps.scope.outputs.scope }}-v${{ steps.version.outputs.local-version }}
 
       - name: 🗑️ » delete outdated drafts
-        uses: hugo19941994/delete-draft-releases@v2.0.0
+        uses: hugo19941994/delete-draft-releases@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
