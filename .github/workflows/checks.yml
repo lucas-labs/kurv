@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📁 » checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: 🦀 » install stable rust
         uses: dtolnay/rust-toolchain@stable
